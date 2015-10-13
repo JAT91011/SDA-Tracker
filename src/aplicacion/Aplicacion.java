@@ -3,7 +3,7 @@ package aplicacion;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import interfaz.PanelPestañas;
+import interfaz.PanelPestanas;
 import interfaz.Ventana;
 
 public class Aplicacion {
@@ -15,7 +15,7 @@ public class Aplicacion {
 				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		Ventana.getInstance().setContentPane(new PanelPestañas());
+		Ventana.getInstance().setContentPane(new PanelPestanas());
 		Ventana.getInstance().setVisible(true);
 	}
 }
