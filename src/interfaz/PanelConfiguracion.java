@@ -101,7 +101,7 @@ public class PanelConfiguracion extends JPanel {
 		gbc_txtPuerto.gridy = 1;
 		add(txtPuerto, gbc_txtPuerto);
 
-		lblDatabase = new JLabel("Ruta descargas:");
+		lblDatabase = new JLabel("Base de datos:");
 		lblDatabase.setForeground(Color.BLACK);
 		lblDatabase.setFont(new Font("Dialog", Font.PLAIN, 14));
 		GridBagConstraints gbc_lblDatabase = new GridBagConstraints();
