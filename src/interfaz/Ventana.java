@@ -16,9 +16,9 @@ public class Ventana extends JFrame {
 		super();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setIconImage(null);
-		setSize(800, 600);
+		setSize(600, 400);
 		// setIconImage((new ImageIcon("img/app-icon.png")).getImage());
-		setMinimumSize(new Dimension(800, 600));
+		setMinimumSize(new Dimension(600, 400));
 		setTitle("Tracker");
 		setLocationRelativeTo(null);
 
