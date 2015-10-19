@@ -1,22 +1,26 @@
 package aplicacion;
 
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import java.awt.EventQueue;
 
-import utilidades.Propiedades;
+import javax.swing.UIManager;
+
 import interfaz.PanelPestanas;
 import interfaz.Ventana;
+import utilidades.Propiedades;
 
 public class Aplicacion {
 
 	public static void main(final String[] args) {
-		try {
-			UIManager.setLookAndFeel(Propiedades.getLookAndFeel());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
-		Ventana.getInstance().setContentPane(new PanelPestanas());
-		Ventana.getInstance().setVisible(true);
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					UIManager.setLookAndFeel(Propiedades.getLookAndFeel());
+					Ventana.getInstance().setContentPane(new PanelPestanas());
+					Ventana.getInstance().setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }
