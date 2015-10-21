@@ -13,24 +13,21 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 public class Propiedades implements Serializable {
 
-	private static final long	serialVersionUID	= -7184695896737258947L;
+	private static final long serialVersionUID = -7184695896737258947L;
 
-	private static Propiedades	propiedades;
+	private static Propiedades propiedades;
 
-	private String				ip;
-	private int					puertoTracker;
-	private int					puertoPeer;
-	private String				databasePath;
-	private String				lookAndFeelClass;
+	private String	ip;
+	private int		puertoTracker;
+	private int		puertoPeer;
+	private String	lookAndFeelClass;
 
 	private Propiedades(final String ip, final int puertoTracker,
-			final int puertoPeer, final String databasePath,
-			String lookAndFeelClass) {
+			final int puertoPeer, String lookAndFeelClass) {
 
 		this.ip = ip;
 		this.puertoTracker = puertoTracker;
 		this.puertoPeer = puertoPeer;
-		this.databasePath = databasePath;
 		this.lookAndFeelClass = lookAndFeelClass;
 	}
 
@@ -43,7 +40,7 @@ public class Propiedades implements Serializable {
 			oos.close();
 		} catch (final IOException e) {
 			e.printStackTrace();
-			propiedades = new Propiedades("", 1000, 2000, "",
+			propiedades = new Propiedades("", 1000, 2000,
 					UIManager.getSystemLookAndFeelClassName());
 		}
 	}
@@ -59,7 +56,7 @@ public class Propiedades implements Serializable {
 			if (!(e instanceof FileNotFoundException)) {
 				e.printStackTrace();
 			}
-			propiedades = new Propiedades("", 1000, 2000, "",
+			propiedades = new Propiedades("", 1000, 2000,
 					UIManager.getSystemLookAndFeelClassName());
 			propiedades.update();
 		}
@@ -107,21 +104,6 @@ public class Propiedades implements Serializable {
 			init();
 		}
 		propiedades.puertoPeer = puertoPeer;
-		propiedades.update();
-	}
-
-	public static String getDatabasePath() {
-		if (propiedades == null) {
-			init();
-		}
-		return propiedades.databasePath;
-	}
-
-	public static void setDatabasePath(final String databasePath) {
-		if (propiedades == null) {
-			init();
-		}
-		propiedades.databasePath = databasePath;
 		propiedades.update();
 	}
 

@@ -3,6 +3,7 @@ package vistas;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -17,7 +18,7 @@ public class Ventana extends JFrame {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setIconImage(null);
 		setSize(600, 400);
-		// setIconImage((new ImageIcon("img/app-icon.png")).getImage());
+		setIconImage((new ImageIcon("icons/app-icon.png")).getImage());
 		setMinimumSize(new Dimension(600, 400));
 		setTitle("Tracker");
 		setLocationRelativeTo(null);
