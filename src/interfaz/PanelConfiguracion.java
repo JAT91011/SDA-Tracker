@@ -7,12 +7,19 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import controladores.ControladoraConfiguracion;
 import utilidades.Propiedades;
@@ -29,6 +36,14 @@ public class PanelConfiguracion extends JPanel {
 	private JButton						btnGuardar;
 	private JLabel						lblApariencia;
 	private JComboBox<String>			cboApariencia;
+
+	private HashMap<String, String>		lookNFeelHashMap;
+	private String						currentLookAndFeel;
+
+	private static String				IPADDRESS_PATTERN	= "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	private ControladoraConfiguracion	controladoraConfiguracion;
 
@@ -127,12 +142,10 @@ public class PanelConfiguracion extends JPanel {
 		gbc_lblApariencia.gridy = 3;
 		add(lblApariencia, gbc_lblApariencia);
 
-		cboApariencia = new JComboBox<String>(
-				controladoraConfiguracion.getAvailableLF());
+		cboApariencia = new JComboBox<String>(getAvailableLF());
 		cboApariencia.setForeground(Color.BLACK);
 		cboApariencia.setFont(new Font("Dialog", Font.PLAIN, 14));
-		cboApariencia.setSelectedItem(
-				controladoraConfiguracion.getCurrentLookAndFeel());
+		cboApariencia.setSelectedItem(currentLookAndFeel);
 		GridBagConstraints gbc_cboApariencia = new GridBagConstraints();
 		gbc_cboApariencia.anchor = GridBagConstraints.WEST;
 		gbc_cboApariencia.insets = new Insets(5, 5, 5, 15);
@@ -144,10 +157,7 @@ public class PanelConfiguracion extends JPanel {
 		btnGuardar.setForeground(Color.BLACK);
 		btnGuardar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				PanelConfiguracion.this.controladoraConfiguracion.guardar(
-						txtIP.getText().trim(),
-						Integer.parseInt(txtPuerto.getText().trim()),
-						cboApariencia.getSelectedItem());
+				PanelConfiguracion.this.guardar();
 			}
 		});
 		btnGuardar.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -157,5 +167,82 @@ public class PanelConfiguracion extends JPanel {
 		gbc_btnGuardar.gridx = 2;
 		gbc_btnGuardar.gridy = 5;
 		add(btnGuardar, gbc_btnGuardar);
+	}
+
+	private Vector<String> getAvailableLF() {
+		final LookAndFeelInfo lfs[] = UIManager.getInstalledLookAndFeels();
+
+		lookNFeelHashMap = new HashMap<>(lfs.length);
+		final Vector<String> v = new Vector<>(lfs.length);
+
+		for (final LookAndFeelInfo lf2 : lfs) {
+			lookNFeelHashMap.put(lf2.getName(), lf2.getClassName());
+			v.add(lf2.getName());
+			if (Propiedades.getLookAndFeel().equals(lf2.getClassName())) {
+				currentLookAndFeel = lf2.getName();
+			}
+		}
+		return v;
+	}
+
+	private String guardar() {
+
+		String mensajeError = "";
+		String rutaBD = txtDatabase.getText().trim();
+		String ip = txtIP.getText().trim();
+		int puerto;
+
+		if (!txtPuerto.getText().trim().equals(""))
+			if (isNumeric(txtPuerto.getText().trim()))
+				puerto = Integer.parseInt(txtPuerto.getText().trim());
+			else
+				puerto = 0;
+		else
+			puerto = 0;
+
+		Object lookandfeel = cboApariencia.getSelectedItem();
+
+		if (!ip.matches(IPADDRESS_PATTERN)) {
+			mensajeError += " - La dirección IP no es válida.\n";
+		}
+
+		if (puerto > 65535 || puerto < 1) {
+			mensajeError += " - El puerto debe ser un valor numérico comprendido entre 0 y 65535.";
+		}
+
+		if (rutaBD.equals(""))
+			mensajeError += " - No has seleccionado ninguna ruta para la base de datos.";
+
+		if (mensajeError.isEmpty()) {
+			Propiedades.setIP(ip);
+			Propiedades.setPort(puerto);
+			Propiedades.setLookAndFeelClass(lookNFeelHashMap.get(lookandfeel));
+			try {
+				UIManager.setLookAndFeel(lookNFeelHashMap.get(lookandfeel));
+			} catch (ClassNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (InstantiationException e1) {
+				e1.printStackTrace();
+			} catch (IllegalAccessException e1) {
+				e1.printStackTrace();
+			} catch (UnsupportedLookAndFeelException e1) {
+				e1.printStackTrace();
+			}
+			SwingUtilities.updateComponentTreeUI(Ventana.getInstance());
+		} else {
+			mensajeError = "Error en los siguientes campos:\n" + mensajeError;
+			JOptionPane.showMessageDialog(Ventana.getInstance(), mensajeError,
+					"Error", JOptionPane.ERROR_MESSAGE);
+		}
+		return mensajeError;
+	}
+
+	private static boolean isNumeric(String cadena) {
+		try {
+			Integer.parseInt(cadena);
+			return true;
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
 	}
 }
