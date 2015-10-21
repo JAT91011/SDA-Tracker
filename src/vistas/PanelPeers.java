@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -11,7 +13,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-public class PanelPeers extends JPanel {
+public class PanelPeers extends JPanel implements Observer {
 
 	private static final long		serialVersionUID	= 4986034677227823532L;
 	private JTable					tablePeers;
@@ -80,5 +82,10 @@ public class PanelPeers extends JPanel {
 		tableContent.getTableHeader()
 				.setFont(new Font("Arial", Font.PLAIN, 15));
 		scrollPaneContent.setViewportView(tableContent);
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+
 	}
 }
