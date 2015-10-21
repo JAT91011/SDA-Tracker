@@ -9,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -25,10 +23,9 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import modelos.GestorRedundancia;
 import utilidades.Propiedades;
 
-public class PanelConfiguracion extends JPanel implements Observer {
+public class PanelConfiguracion extends JPanel {
 
 	private static final long		serialVersionUID	= 4959247560481979942L;
 
@@ -44,16 +41,12 @@ public class PanelConfiguracion extends JPanel implements Observer {
 	private HashMap<String, String>	lookNFeelHashMap;
 	private String					currentLookAndFeel;
 
-	private GestorRedundancia		gr;
-
 	private static String			IPADDRESS_PATTERN	= "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	private JFileChooser			fc;
-	private JLabel					lblPrueba;
-	private JButton					btnCambiarValor;
 	private JLabel					lblPuertoPeers;
 	private JTextField				txtPuertoPeers;
 
@@ -198,31 +191,6 @@ public class PanelConfiguracion extends JPanel implements Observer {
 			}
 		});
 
-		// Inicio prueba Observable/Observer
-		gr = new GestorRedundancia("Endika");
-		gr.addObserver(PanelConfiguracion.this);
-
-		lblPrueba = new JLabel("Prueba");
-		GridBagConstraints gbc_lblPrueba = new GridBagConstraints();
-		gbc_lblPrueba.insets = new Insets(0, 0, 5, 5);
-		gbc_lblPrueba.gridx = 0;
-		gbc_lblPrueba.gridy = 6;
-		add(lblPrueba, gbc_lblPrueba);
-		lblPrueba.setText(gr.getValue());
-
-		btnCambiarValor = new JButton("cambiar valor");
-		btnCambiarValor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				gr.setValue("Jordan");
-			}
-		});
-		GridBagConstraints gbc_btnCambiarValor = new GridBagConstraints();
-		gbc_btnCambiarValor.insets = new Insets(0, 0, 0, 5);
-		gbc_btnCambiarValor.gridx = 0;
-		gbc_btnCambiarValor.gridy = 7;
-		add(btnCambiarValor, gbc_btnCambiarValor);
-		// Fin prueba Observable/Observer
-
 		btnGuardar.setFont(new Font("Dialog", Font.PLAIN, 14));
 		GridBagConstraints gbc_btnGuardar = new GridBagConstraints();
 		gbc_btnGuardar.fill = GridBagConstraints.HORIZONTAL;
@@ -256,7 +224,7 @@ public class PanelConfiguracion extends JPanel implements Observer {
 		int puertoPeer;
 
 		if (!txtPuertoTrackers.getText().trim().equals("")) {
-			if (isNumeric(txtPuertoTrackers.getText().trim()))
+			if (esNumerico(txtPuertoTrackers.getText().trim()))
 				puertoTracker = Integer
 						.parseInt(txtPuertoTrackers.getText().trim());
 			else
@@ -266,7 +234,7 @@ public class PanelConfiguracion extends JPanel implements Observer {
 		}
 
 		if (!txtPuertoPeers.getText().trim().equals("")) {
-			if (isNumeric(txtPuertoPeers.getText().trim()))
+			if (esNumerico(txtPuertoPeers.getText().trim()))
 				puertoPeer = Integer.parseInt(txtPuertoPeers.getText().trim());
 			else
 				puertoPeer = 0;
@@ -321,7 +289,7 @@ public class PanelConfiguracion extends JPanel implements Observer {
 		return mensajeError;
 	}
 
-	private static boolean isNumeric(String cadena) {
+	private static boolean esNumerico(String cadena) {
 		try {
 			Integer.parseInt(cadena);
 			return true;
@@ -346,14 +314,6 @@ public class PanelConfiguracion extends JPanel implements Observer {
 			File archivoElegido = fc.getSelectedFile();
 			// Mostrar el nombre del archvivo en un campo de texto
 			txtDatabase.setText(archivoElegido.getPath());
-		}
-	}
-
-	@Override
-	public void update(Observable o, Object arg) {
-
-		if (o == gr) {
-			lblPrueba.setText(gr.getValue());
 		}
 	}
 }

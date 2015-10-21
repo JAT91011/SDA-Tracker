@@ -66,6 +66,8 @@ public class PanelTrackers extends JPanel implements Observer {
 
 		tablaTrackers.getTableHeader()
 				.setFont(new Font("Arial", Font.PLAIN, 15));
+
+		GestorTrackers.ObtenerInstancia().addObserver(this);
 	}
 
 	@Override
@@ -81,11 +83,12 @@ public class PanelTrackers extends JPanel implements Observer {
 				} else {
 					contenido[i][1] = "Esclavo";
 				}
-				contenido[i][0] = Long.toString(
+				contenido[i][2] = Long.toString(
 						trackers.get(i).getDifferenceBetweenKeepAlive())
 						+ " segundos";
 			}
 			modelTable.setDataVector(contenido, header);
+			tablaTrackers.setModel(modelTable);
 		}
 	}
 }
