@@ -26,6 +26,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 
 import utilidades.Propiedades;
+import vistas.componentes.IFileChooser;
 import vistas.componentes.ITextField;
 
 public class PanelConfiguracion extends JPanel {
@@ -46,19 +47,21 @@ public class PanelConfiguracion extends JPanel {
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
-	private JLabel	lblPuertoPeers;
-	private JPanel	panAjustes;
-	private JPanel	panBotonera;
-	private JButton	btnConectar;
-	private JButton	btnResetear;
-	private JLabel	lblEstado;
-	private JLabel	lblEstadoActual;
+	private JLabel							lblPuertoPeers;
+	private JPanel							panAjustes;
+	private JButton							btnConectar;
+	private JButton							btnResetear;
+	private JLabel							lblEstado;
+	private JLabel							lblEstadoActual;
+	private JLabel							lblRutaBaseDatos;
+	private JPanel							IFileChooser;
+	private vistas.componentes.IFileChooser	panFileChooser;
 
 	public PanelConfiguracion() {
 		setOpaque(false);
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 0, 400, 0, 0 };
+		gridBagLayout.columnWidths = new int[] { 0, 500, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 102, 0, 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 1.0, 0.0, 1.0,
 				Double.MIN_VALUE };
@@ -78,10 +81,10 @@ public class PanelConfiguracion extends JPanel {
 		add(panAjustes, gbc_panAjustes);
 		GridBagLayout gbl_panAjustes = new GridBagLayout();
 		gbl_panAjustes.columnWidths = new int[] { 0, 0, 0 };
-		gbl_panAjustes.rowHeights = new int[] { 0, 45, 45, 45, 52, 0 };
+		gbl_panAjustes.rowHeights = new int[] { 0, 45, 45, 45, 45, 52, 0 };
 		gbl_panAjustes.columnWeights = new double[] { 0.0, 1.0,
 				Double.MIN_VALUE };
-		gbl_panAjustes.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
+		gbl_panAjustes.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 				Double.MIN_VALUE };
 		panAjustes.setLayout(gbl_panAjustes);
 
@@ -188,12 +191,31 @@ public class PanelConfiguracion extends JPanel {
 		txtPuertoPeers.setForeground(Color.BLACK);
 		txtPuertoPeers.setFont(new Font("Dialog", Font.PLAIN, 14));
 
+		lblRutaBaseDatos = new JLabel("Ruta base de datos:");
+		lblRutaBaseDatos.setForeground(Color.BLACK);
+		lblRutaBaseDatos.setFont(new Font("Dialog", Font.PLAIN, 14));
+		GridBagConstraints gbc_lblRutaBaseDatos = new GridBagConstraints();
+		gbc_lblRutaBaseDatos.anchor = GridBagConstraints.WEST;
+		gbc_lblRutaBaseDatos.insets = new Insets(5, 15, 5, 5);
+		gbc_lblRutaBaseDatos.gridx = 0;
+		gbc_lblRutaBaseDatos.gridy = 4;
+		panAjustes.add(lblRutaBaseDatos, gbc_lblRutaBaseDatos);
+
+		panFileChooser = new IFileChooser();
+		panFileChooser.setButtonIcon(new ImageIcon("icons/file-icon.png"));
+		GridBagConstraints gbc_panFileChooser = new GridBagConstraints();
+		gbc_panFileChooser.insets = new Insets(5, 5, 5, 15);
+		gbc_panFileChooser.fill = GridBagConstraints.BOTH;
+		gbc_panFileChooser.gridx = 1;
+		gbc_panFileChooser.gridy = 4;
+		panAjustes.add(panFileChooser, gbc_panFileChooser);
+
 		lblApariencia = new JLabel("Apariencia:");
 		GridBagConstraints gbc_lblApariencia = new GridBagConstraints();
 		gbc_lblApariencia.anchor = GridBagConstraints.WEST;
 		gbc_lblApariencia.insets = new Insets(5, 15, 15, 5);
 		gbc_lblApariencia.gridx = 0;
-		gbc_lblApariencia.gridy = 4;
+		gbc_lblApariencia.gridy = 5;
 		panAjustes.add(lblApariencia, gbc_lblApariencia);
 		lblApariencia.setForeground(Color.BLACK);
 		lblApariencia.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -203,13 +225,13 @@ public class PanelConfiguracion extends JPanel {
 		gbc_cboApariencia.fill = GridBagConstraints.BOTH;
 		gbc_cboApariencia.insets = new Insets(5, 5, 15, 15);
 		gbc_cboApariencia.gridx = 1;
-		gbc_cboApariencia.gridy = 4;
+		gbc_cboApariencia.gridy = 5;
 		panAjustes.add(cboApariencia, gbc_cboApariencia);
 		cboApariencia.setForeground(Color.BLACK);
 		cboApariencia.setFont(new Font("Dialog", Font.PLAIN, 14));
 		cboApariencia.setSelectedItem(currentLookAndFeel);
 
-		panBotonera = new JPanel();
+		JPanel panBotonera = new JPanel();
 		panBotonera.setOpaque(false);
 		GridBagConstraints gbc_panBotonera = new GridBagConstraints();
 		gbc_panBotonera.insets = new Insets(10, 0, 5, 5);
@@ -294,6 +316,7 @@ public class PanelConfiguracion extends JPanel {
 		String ip = txtIP.getText().trim();
 		int puertoTracker = 0;
 		int puertoPeer = 0;
+		String rutaBaseDatos = "";
 
 		if (!txtPuertoTrackers.getText().trim().isEmpty()) {
 			puertoTracker = Integer
@@ -345,11 +368,21 @@ public class PanelConfiguracion extends JPanel {
 			}
 		}
 
+		if (panFileChooser.getFile() == null) {
+			mensajeError += " - No has seleccionado ninguna ruta para la base de datos.\n";
+			panFileChooser.setErrorVisible(true);
+		} else if (!panFileChooser.getFile().exists()) {
+			mensajeError += " - No existe el fichero seleccionado.\n";
+			panFileChooser.setErrorVisible(true);
+		} else {
+			panFileChooser.setErrorVisible(false);
+		}
+
 		if (mensajeError.isEmpty()) {
 			Propiedades.setIP(ip);
 			Propiedades.setPuertoTracker(puertoTracker);
 			Propiedades.setPuertoPeer(puertoPeer);
-
+			Propiedades.setRutaBaseDatos(rutaBaseDatos);
 			Propiedades.setLookAndFeelClass(lookNFeelHashMap.get(lookandfeel));
 			try {
 				UIManager.setLookAndFeel(lookNFeelHashMap.get(lookandfeel));

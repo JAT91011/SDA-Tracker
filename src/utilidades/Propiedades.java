@@ -20,14 +20,17 @@ public class Propiedades implements Serializable {
 	private String	ip;
 	private int		puertoTracker;
 	private int		puertoPeer;
+	private String	rutaBaseDatos;
 	private String	lookAndFeelClass;
 
 	private Propiedades(final String ip, final int puertoTracker,
-			final int puertoPeer, String lookAndFeelClass) {
+			final int puertoPeer, String rutaBaseDatos,
+			String lookAndFeelClass) {
 
 		this.ip = ip;
 		this.puertoTracker = puertoTracker;
 		this.puertoPeer = puertoPeer;
+		this.rutaBaseDatos = rutaBaseDatos;
 		this.lookAndFeelClass = lookAndFeelClass;
 	}
 
@@ -40,8 +43,9 @@ public class Propiedades implements Serializable {
 			oos.close();
 		} catch (final IOException e) {
 			e.printStackTrace();
-			propiedades = new Propiedades("", 1000, 2000,
-					UIManager.getSystemLookAndFeelClassName());
+			propiedades = new Propiedades("127.0.0.1", 1000, 2000,
+					"data/db.sqlite",
+					"javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		}
 	}
 
@@ -56,8 +60,9 @@ public class Propiedades implements Serializable {
 			if (!(e instanceof FileNotFoundException)) {
 				e.printStackTrace();
 			}
-			propiedades = new Propiedades("", 1000, 2000,
-					UIManager.getSystemLookAndFeelClassName());
+			propiedades = new Propiedades("127.0.0.1", 1000, 2000,
+					"data/db.sqlite",
+					"javax.swing.plaf.nimbus.NimbusLookAndFeel");
 			propiedades.update();
 		}
 	}
@@ -104,6 +109,21 @@ public class Propiedades implements Serializable {
 			init();
 		}
 		propiedades.puertoPeer = puertoPeer;
+		propiedades.update();
+	}
+
+	public static String getRutaBaseDatos() {
+		if (propiedades == null) {
+			init();
+		}
+		return propiedades.rutaBaseDatos;
+	}
+
+	public static void setRutaBaseDatos(final String rutaBaseDatos) {
+		if (propiedades == null) {
+			init();
+		}
+		propiedades.rutaBaseDatos = rutaBaseDatos;
 		propiedades.update();
 	}
 
