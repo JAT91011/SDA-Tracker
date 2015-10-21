@@ -1,4 +1,4 @@
-package interfaz;
+package vistas;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

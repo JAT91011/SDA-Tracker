@@ -1,4 +1,4 @@
-package interfaz;
+package vistas;
 
 import javax.swing.JTabbedPane;
 

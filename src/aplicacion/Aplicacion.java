@@ -4,9 +4,9 @@ import java.awt.EventQueue;
 
 import javax.swing.UIManager;
 
-import interfaz.PanelPestanas;
-import interfaz.Ventana;
 import utilidades.Propiedades;
+import vistas.PanelPestanas;
+import vistas.Ventana;
 
 public class Aplicacion {
 
