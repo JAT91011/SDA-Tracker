@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -23,9 +25,10 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import modelos.GestorRedundancia;
 import utilidades.Propiedades;
 
-public class PanelConfiguracion extends JPanel {
+public class PanelConfiguracion extends JPanel implements Observer {
 
 	private static final long		serialVersionUID	= 4959247560481979942L;
 
@@ -41,22 +44,26 @@ public class PanelConfiguracion extends JPanel {
 	private HashMap<String, String>	lookNFeelHashMap;
 	private String					currentLookAndFeel;
 
+	private GestorRedundancia		gr;
+
 	private static String			IPADDRESS_PATTERN	= "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	private JFileChooser			fc;
+	private JLabel					lblPrueba;
+	private JButton					btnCambiarValor;
 
 	public PanelConfiguracion() {
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0,
 				Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-				Double.MIN_VALUE };
+				0.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
 		JLabel lblIP = new JLabel("Direcci\u00F3n IP:");
@@ -165,12 +172,38 @@ public class PanelConfiguracion extends JPanel {
 				PanelConfiguracion.this.guardar();
 			}
 		});
+
+		// Inicio prueba Observable/Observer
+		gr = new GestorRedundancia("Endika");
+		gr.addObserver(PanelConfiguracion.this);
+
+		lblPrueba = new JLabel("Prueba");
+		GridBagConstraints gbc_lblPrueba = new GridBagConstraints();
+		gbc_lblPrueba.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPrueba.gridx = 0;
+		gbc_lblPrueba.gridy = 5;
+		add(lblPrueba, gbc_lblPrueba);
+		lblPrueba.setText(gr.getValue());
+
+		btnCambiarValor = new JButton("cambiar valor");
+		btnCambiarValor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gr.setValue("Jordan");
+			}
+		});
+		GridBagConstraints gbc_btnCambiarValor = new GridBagConstraints();
+		gbc_btnCambiarValor.insets = new Insets(0, 0, 0, 5);
+		gbc_btnCambiarValor.gridx = 0;
+		gbc_btnCambiarValor.gridy = 6;
+		add(btnCambiarValor, gbc_btnCambiarValor);
+		// Fin prueba Observable/Observer
+
 		btnGuardar.setFont(new Font("Dialog", Font.PLAIN, 14));
 		GridBagConstraints gbc_btnGuardar = new GridBagConstraints();
 		gbc_btnGuardar.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnGuardar.insets = new Insets(15, 0, 15, 15);
 		gbc_btnGuardar.gridx = 2;
-		gbc_btnGuardar.gridy = 5;
+		gbc_btnGuardar.gridy = 6;
 		add(btnGuardar, gbc_btnGuardar);
 	}
 
@@ -267,6 +300,14 @@ public class PanelConfiguracion extends JPanel {
 			File archivoElegido = fc.getSelectedFile();
 			// Mostrar el nombre del archvivo en un campo de texto
 			txtDatabase.setText(archivoElegido.getPath());
+		}
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+
+		if (o == gr) {
+			lblPrueba.setText(gr.getValue());
 		}
 	}
 }
