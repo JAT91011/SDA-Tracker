@@ -7,11 +7,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -46,6 +48,7 @@ public class PanelConfiguracion extends JPanel {
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	private ControladoraConfiguracion	controladoraConfiguracion;
+	private JFileChooser				fc;
 
 	public PanelConfiguracion() {
 
@@ -122,8 +125,14 @@ public class PanelConfiguracion extends JPanel {
 		gbc_txtDatabase.gridx = 1;
 		gbc_txtDatabase.gridy = 2;
 		add(txtDatabase, gbc_txtDatabase);
+		txtDatabase.setEnabled(false);
 
 		btnExaminar = new JButton("Examinar");
+		btnExaminar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				PanelConfiguracion.this.elegirArchivoBD();
+			}
+		});
 		btnExaminar.setForeground(Color.BLACK);
 		btnExaminar.setFont(new Font("Dialog", Font.PLAIN, 14));
 		GridBagConstraints gbc_btnExaminar = new GridBagConstraints();
@@ -207,11 +216,11 @@ public class PanelConfiguracion extends JPanel {
 		}
 
 		if (puerto > 65535 || puerto < 1) {
-			mensajeError += " - El puerto debe ser un valor numérico comprendido entre 0 y 65535.";
+			mensajeError += " - El puerto debe ser un valor numérico comprendido entre 0 y 65535.\n";
 		}
 
 		if (rutaBD.equals(""))
-			mensajeError += " - No has seleccionado ninguna ruta para la base de datos.";
+			mensajeError += " - No has seleccionado ninguna ruta para la base de datos.\n";
 
 		if (mensajeError.isEmpty()) {
 			Propiedades.setIP(ip);
@@ -243,6 +252,25 @@ public class PanelConfiguracion extends JPanel {
 			return true;
 		} catch (NumberFormatException nfe) {
 			return false;
+		}
+	}
+
+	private void elegirArchivoBD() {
+		// Creamos un objeto FileChooser
+		fc = new JFileChooser();
+
+		/*
+		 * Mostrar la ventana para abrir archivo y recoger la respuesta En el
+		 * parámetro del showOpenDialog se indica la ventana al que estará
+		 * asociado. Con el valor this se asocia a la ventana que la abre.
+		 */
+		int respuesta = fc.showOpenDialog(PanelConfiguracion.this);
+		// Comprobar si se ha pulsado Aceptar
+		if (respuesta == JFileChooser.APPROVE_OPTION) {
+			// Crear un objeto File con el archivo elegido
+			File archivoElegido = fc.getSelectedFile();
+			// Mostrar el nombre del archvivo en un campo de texto
+			txtDatabase.setText(archivoElegido.getPath());
 		}
 	}
 }
