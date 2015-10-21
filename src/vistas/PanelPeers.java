@@ -1,9 +1,11 @@
 package vistas;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -22,25 +24,42 @@ public class PanelPeers extends JPanel implements Observer {
 	private DefaultTableModel		modelTableContent;
 
 	public PanelPeers() {
-
-		setLayout(new BorderLayout(0, 0));
-
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setDividerSize(5);
-		splitPane.setResizeWeight(.7d);
-		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		add(splitPane, BorderLayout.CENTER);
-
-		JScrollPane scrollPanePeers = new JScrollPane();
-		scrollPanePeers.setSize(new Dimension(0, 300));
-		scrollPanePeers.setPreferredSize(new Dimension(4, 300));
-		splitPane.setLeftComponent(scrollPanePeers);
+		setOpaque(false);
+		GridBagLayout gridBagLayout = new GridBagLayout();
+		gridBagLayout.columnWidths = new int[] { 450, 0 };
+		gridBagLayout.rowHeights = new int[] { 300, 0 };
+		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
+		setLayout(gridBagLayout);
 
 		final String[] headerPeers = { "ID", "IP", "Puerto" };
 
 		modelTablePeers = new DefaultTableModel();
 		modelTablePeers.setDataVector(new String[1][headerPeers.length],
 				headerPeers);
+
+		final String[] headerContent = { "ID", "INFO_HASH", "Estado",
+				"Completado" };
+
+		modelTableContent = new DefaultTableModel();
+		modelTableContent.setDataVector(new String[1][headerContent.length],
+				headerContent);
+
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setDividerSize(5);
+		splitPane.setResizeWeight(.7d);
+		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		GridBagConstraints gbc_splitPane = new GridBagConstraints();
+		gbc_splitPane.insets = new Insets(10, 10, 10, 10);
+		gbc_splitPane.fill = GridBagConstraints.BOTH;
+		gbc_splitPane.gridx = 0;
+		gbc_splitPane.gridy = 0;
+		add(splitPane, gbc_splitPane);
+
+		JScrollPane scrollPanePeers = new JScrollPane();
+		scrollPanePeers.setSize(new Dimension(0, 300));
+		scrollPanePeers.setPreferredSize(new Dimension(4, 300));
+		splitPane.setLeftComponent(scrollPanePeers);
 		tablePeers = new JTable(modelTablePeers);
 		tablePeers.getTableHeader().setReorderingAllowed(false);
 		tablePeers.setShowVerticalLines(true);
@@ -61,13 +80,6 @@ public class PanelPeers extends JPanel implements Observer {
 		scrollPaneContent.setSize(new Dimension(0, 100));
 		scrollPaneContent.setPreferredSize(new Dimension(4, 100));
 		splitPane.setRightComponent(scrollPaneContent);
-
-		final String[] headerContent = { "ID", "INFO_HASH", "Estado",
-				"Completado" };
-
-		modelTableContent = new DefaultTableModel();
-		modelTableContent.setDataVector(new String[1][headerContent.length],
-				headerContent);
 		tableContent = new JTable(modelTableContent);
 		tableContent.getTableHeader().setReorderingAllowed(false);
 		tableContent.setShowVerticalLines(true);

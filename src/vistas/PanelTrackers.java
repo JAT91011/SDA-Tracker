@@ -25,6 +25,7 @@ public class PanelTrackers extends JPanel implements Observer {
 	private String[]				header;
 
 	public PanelTrackers() {
+		setOpaque(false);
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };

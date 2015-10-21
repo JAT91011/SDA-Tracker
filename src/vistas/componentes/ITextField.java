@@ -58,6 +58,14 @@ public class ITextField extends JTextField implements FocusListener {
 	}
 
 	/**
+	 * @param hint
+	 *            Change the text as hint text
+	 */
+	public void showAsHint(boolean hint) {
+		this.showingHint = true;
+	}
+
+	/**
 	 * @param icon
 	 *            The icon to be displayed
 	 */

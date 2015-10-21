@@ -48,8 +48,14 @@ public class PanelConfiguracion extends JPanel {
 
 	private JLabel	lblPuertoPeers;
 	private JPanel	panAjustes;
+	private JPanel	panBotonera;
+	private JButton	btnConectar;
+	private JButton	btnResetear;
+	private JLabel	lblEstado;
+	private JLabel	lblEstadoActual;
 
 	public PanelConfiguracion() {
+		setOpaque(false);
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 400, 0, 0 };
@@ -72,19 +78,39 @@ public class PanelConfiguracion extends JPanel {
 		add(panAjustes, gbc_panAjustes);
 		GridBagLayout gbl_panAjustes = new GridBagLayout();
 		gbl_panAjustes.columnWidths = new int[] { 0, 0, 0 };
-		gbl_panAjustes.rowHeights = new int[] { 55, 45, 45, 50, 0 };
+		gbl_panAjustes.rowHeights = new int[] { 0, 45, 45, 45, 52, 0 };
 		gbl_panAjustes.columnWeights = new double[] { 0.0, 1.0,
 				Double.MIN_VALUE };
-		gbl_panAjustes.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
+		gbl_panAjustes.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
 				Double.MIN_VALUE };
 		panAjustes.setLayout(gbl_panAjustes);
+
+		lblEstado = new JLabel("Estado:");
+		lblEstado.setForeground(Color.BLACK);
+		lblEstado.setFont(new Font("Dialog", Font.PLAIN, 14));
+		GridBagConstraints gbc_lblEstado = new GridBagConstraints();
+		gbc_lblEstado.anchor = GridBagConstraints.WEST;
+		gbc_lblEstado.insets = new Insets(15, 15, 5, 5);
+		gbc_lblEstado.gridx = 0;
+		gbc_lblEstado.gridy = 0;
+		panAjustes.add(lblEstado, gbc_lblEstado);
+
+		lblEstadoActual = new JLabel("Desconectado");
+		lblEstadoActual.setForeground(new Color(220, 20, 60));
+		lblEstadoActual.setFont(new Font("Dialog", Font.PLAIN, 14));
+		GridBagConstraints gbc_lblEstadoActual = new GridBagConstraints();
+		gbc_lblEstadoActual.anchor = GridBagConstraints.WEST;
+		gbc_lblEstadoActual.insets = new Insets(15, 7, 5, 15);
+		gbc_lblEstadoActual.gridx = 1;
+		gbc_lblEstadoActual.gridy = 0;
+		panAjustes.add(lblEstadoActual, gbc_lblEstadoActual);
 
 		JLabel lblIP = new JLabel("Direcci\u00F3n IP:");
 		GridBagConstraints gbc_lblIP = new GridBagConstraints();
 		gbc_lblIP.anchor = GridBagConstraints.WEST;
-		gbc_lblIP.insets = new Insets(15, 15, 5, 5);
+		gbc_lblIP.insets = new Insets(5, 15, 5, 5);
 		gbc_lblIP.gridx = 0;
-		gbc_lblIP.gridy = 0;
+		gbc_lblIP.gridy = 1;
 		panAjustes.add(lblIP, gbc_lblIP);
 		lblIP.setForeground(Color.BLACK);
 		lblIP.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -92,10 +118,10 @@ public class PanelConfiguracion extends JPanel {
 		txtIP = new ITextField(Propiedades.getIP());
 		txtIP.setErrorIcon(new ImageIcon("icons/error-icon.png"));
 		GridBagConstraints gbc_txtIP = new GridBagConstraints();
-		gbc_txtIP.insets = new Insets(15, 5, 5, 15);
+		gbc_txtIP.insets = new Insets(5, 5, 5, 15);
 		gbc_txtIP.fill = GridBagConstraints.BOTH;
 		gbc_txtIP.gridx = 1;
-		gbc_txtIP.gridy = 0;
+		gbc_txtIP.gridy = 1;
 		panAjustes.add(txtIP, gbc_txtIP);
 		txtIP.setForeground(Color.BLACK);
 		txtIP.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -105,7 +131,7 @@ public class PanelConfiguracion extends JPanel {
 		gbc_lblPuertoTrackers.anchor = GridBagConstraints.WEST;
 		gbc_lblPuertoTrackers.insets = new Insets(5, 15, 5, 5);
 		gbc_lblPuertoTrackers.gridx = 0;
-		gbc_lblPuertoTrackers.gridy = 1;
+		gbc_lblPuertoTrackers.gridy = 2;
 		panAjustes.add(lblPuertoTrackers, gbc_lblPuertoTrackers);
 		lblPuertoTrackers.setForeground(Color.BLACK);
 		lblPuertoTrackers.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -126,7 +152,7 @@ public class PanelConfiguracion extends JPanel {
 		gbc_txtPuertoTrackers.fill = GridBagConstraints.BOTH;
 		gbc_txtPuertoTrackers.insets = new Insets(5, 5, 5, 15);
 		gbc_txtPuertoTrackers.gridx = 1;
-		gbc_txtPuertoTrackers.gridy = 1;
+		gbc_txtPuertoTrackers.gridy = 2;
 		panAjustes.add(txtPuertoTrackers, gbc_txtPuertoTrackers);
 		txtPuertoTrackers.setForeground(Color.BLACK);
 		txtPuertoTrackers.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -136,7 +162,7 @@ public class PanelConfiguracion extends JPanel {
 		gbc_lblPuertoPeers.anchor = GridBagConstraints.WEST;
 		gbc_lblPuertoPeers.insets = new Insets(5, 15, 5, 5);
 		gbc_lblPuertoPeers.gridx = 0;
-		gbc_lblPuertoPeers.gridy = 2;
+		gbc_lblPuertoPeers.gridy = 3;
 		panAjustes.add(lblPuertoPeers, gbc_lblPuertoPeers);
 		lblPuertoPeers.setForeground(Color.BLACK);
 		lblPuertoPeers.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -157,7 +183,7 @@ public class PanelConfiguracion extends JPanel {
 		gbc_txtPuertoPeers.fill = GridBagConstraints.BOTH;
 		gbc_txtPuertoPeers.insets = new Insets(5, 5, 5, 15);
 		gbc_txtPuertoPeers.gridx = 1;
-		gbc_txtPuertoPeers.gridy = 2;
+		gbc_txtPuertoPeers.gridy = 3;
 		panAjustes.add(txtPuertoPeers, gbc_txtPuertoPeers);
 		txtPuertoPeers.setForeground(Color.BLACK);
 		txtPuertoPeers.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -167,7 +193,7 @@ public class PanelConfiguracion extends JPanel {
 		gbc_lblApariencia.anchor = GridBagConstraints.WEST;
 		gbc_lblApariencia.insets = new Insets(5, 15, 15, 5);
 		gbc_lblApariencia.gridx = 0;
-		gbc_lblApariencia.gridy = 3;
+		gbc_lblApariencia.gridy = 4;
 		panAjustes.add(lblApariencia, gbc_lblApariencia);
 		lblApariencia.setForeground(Color.BLACK);
 		lblApariencia.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -177,13 +203,66 @@ public class PanelConfiguracion extends JPanel {
 		gbc_cboApariencia.fill = GridBagConstraints.BOTH;
 		gbc_cboApariencia.insets = new Insets(5, 5, 15, 15);
 		gbc_cboApariencia.gridx = 1;
-		gbc_cboApariencia.gridy = 3;
+		gbc_cboApariencia.gridy = 4;
 		panAjustes.add(cboApariencia, gbc_cboApariencia);
 		cboApariencia.setForeground(Color.BLACK);
 		cboApariencia.setFont(new Font("Dialog", Font.PLAIN, 14));
 		cboApariencia.setSelectedItem(currentLookAndFeel);
 
+		panBotonera = new JPanel();
+		panBotonera.setOpaque(false);
+		GridBagConstraints gbc_panBotonera = new GridBagConstraints();
+		gbc_panBotonera.insets = new Insets(10, 0, 5, 5);
+		gbc_panBotonera.fill = GridBagConstraints.BOTH;
+		gbc_panBotonera.gridx = 1;
+		gbc_panBotonera.gridy = 2;
+		add(panBotonera, gbc_panBotonera);
+		GridBagLayout gbl_panBotonera = new GridBagLayout();
+		gbl_panBotonera.columnWidths = new int[] { 0, 0, 0, 0 };
+		gbl_panBotonera.rowHeights = new int[] { 0, 0 };
+		gbl_panBotonera.columnWeights = new double[] { 1.0, 0.0, 1.0,
+				Double.MIN_VALUE };
+		gbl_panBotonera.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		panBotonera.setLayout(gbl_panBotonera);
+
+		btnResetear = new JButton("Resetear");
+		btnResetear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				txtIP.setText("127.0.0.1");
+				txtIP.showAsHint(true);
+				txtIP.hideError();
+				txtPuertoPeers.setText("2000");
+				txtPuertoPeers.showAsHint(true);
+				txtPuertoPeers.hideError();
+				txtPuertoTrackers.setText("1000");
+				txtPuertoTrackers.showAsHint(true);
+				txtPuertoTrackers.hideError();
+			}
+		});
+		btnResetear.setForeground(Color.BLACK);
+		btnResetear.setFont(new Font("Dialog", Font.PLAIN, 14));
+		GridBagConstraints gbc_btnResetear = new GridBagConstraints();
+		gbc_btnResetear.anchor = GridBagConstraints.WEST;
+		gbc_btnResetear.insets = new Insets(0, 0, 0, 5);
+		gbc_btnResetear.gridx = 0;
+		gbc_btnResetear.gridy = 0;
+		panBotonera.add(btnResetear, gbc_btnResetear);
+
+		btnConectar = new JButton("Establecer conexi\u00F3n");
+		btnConectar.setForeground(Color.BLACK);
+		btnConectar.setFont(new Font("Dialog", Font.PLAIN, 14));
+		GridBagConstraints gbc_btnConectar = new GridBagConstraints();
+		gbc_btnConectar.insets = new Insets(0, 0, 0, 5);
+		gbc_btnConectar.gridx = 1;
+		gbc_btnConectar.gridy = 0;
+		panBotonera.add(btnConectar, gbc_btnConectar);
+
 		btnGuardar = new JButton("Guardar");
+		GridBagConstraints gbc_btnGuardar = new GridBagConstraints();
+		gbc_btnGuardar.anchor = GridBagConstraints.EAST;
+		gbc_btnGuardar.gridx = 2;
+		gbc_btnGuardar.gridy = 0;
+		panBotonera.add(btnGuardar, gbc_btnGuardar);
 		btnGuardar.setForeground(Color.BLACK);
 		btnGuardar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -192,11 +271,6 @@ public class PanelConfiguracion extends JPanel {
 		});
 
 		btnGuardar.setFont(new Font("Dialog", Font.PLAIN, 14));
-		GridBagConstraints gbc_btnGuardar = new GridBagConstraints();
-		gbc_btnGuardar.insets = new Insets(15, 0, 0, 0);
-		gbc_btnGuardar.gridx = 1;
-		gbc_btnGuardar.gridy = 2;
-		add(btnGuardar, gbc_btnGuardar);
 	}
 
 	private Vector<String> getAvailableLF() {
