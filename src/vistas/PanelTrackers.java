@@ -26,7 +26,7 @@ public class PanelTrackers extends JPanel {
 		gridBagLayout.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
-		final String[] header = { "ID", "Master", "Ãšltimo keep alive" };
+		final String[] header = { "ID", "Master", "Último keep alive" };
 		final String[][] content = new String[1][header.length];
 
 		modelTable = new DefaultTableModel();
