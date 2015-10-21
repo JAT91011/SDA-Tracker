@@ -11,18 +11,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import controladores.ControladoraTrackers;
-
 public class PanelTrackers extends JPanel {
 
 	private static final long		serialVersionUID	= 1276595089834953384L;
 	private JTable					tablaTrackers;
 	private final DefaultTableModel	modelTable;
-	private ControladoraTrackers	controladoraTrackers;
 
 	public PanelTrackers() {
-
-		this.controladoraTrackers = new ControladoraTrackers();
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };
@@ -59,7 +54,7 @@ public class PanelTrackers extends JPanel {
 		tablaTrackers.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 14));
 		tablaTrackers.setRowHeight(30);
 
-		tablaTrackers.getTableHeader().setFont(
-				new Font("Arial", Font.PLAIN, 15));
+		tablaTrackers.getTableHeader()
+				.setFont(new Font("Arial", Font.PLAIN, 15));
 	}
 }

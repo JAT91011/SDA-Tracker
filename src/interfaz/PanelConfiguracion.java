@@ -23,36 +23,32 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import controladores.ControladoraConfiguracion;
 import utilidades.Propiedades;
 
 public class PanelConfiguracion extends JPanel {
 
-	private static final long			serialVersionUID	= 4959247560481979942L;
+	private static final long		serialVersionUID	= 4959247560481979942L;
 
-	private JTextField					txtIP;
-	private JTextField					txtPuerto;
-	private JLabel						lblDatabase;
-	private JButton						btnExaminar;
-	private JTextField					txtDatabase;
-	private JButton						btnGuardar;
-	private JLabel						lblApariencia;
-	private JComboBox<String>			cboApariencia;
+	private JTextField				txtIP;
+	private JTextField				txtPuerto;
+	private JLabel					lblDatabase;
+	private JButton					btnExaminar;
+	private JTextField				txtDatabase;
+	private JButton					btnGuardar;
+	private JLabel					lblApariencia;
+	private JComboBox<String>		cboApariencia;
 
-	private HashMap<String, String>		lookNFeelHashMap;
-	private String						currentLookAndFeel;
+	private HashMap<String, String>	lookNFeelHashMap;
+	private String					currentLookAndFeel;
 
-	private static String				IPADDRESS_PATTERN	= "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+	private static String			IPADDRESS_PATTERN	= "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
-	private ControladoraConfiguracion	controladoraConfiguracion;
-	private JFileChooser				fc;
+	private JFileChooser			fc;
 
 	public PanelConfiguracion() {
-
-		this.controladoraConfiguracion = new ControladoraConfiguracion();
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };

@@ -11,8 +11,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import controladores.ControladoraPeers;
-
 public class PanelPeers extends JPanel {
 
 	private static final long		serialVersionUID	= 4986034677227823532L;
@@ -21,11 +19,7 @@ public class PanelPeers extends JPanel {
 	private JTable					tableContent;
 	private DefaultTableModel		modelTableContent;
 
-	private ControladoraPeers		controladoraPeers;
-
 	public PanelPeers() {
-
-		this.controladoraPeers = new ControladoraPeers();
 
 		setLayout(new BorderLayout(0, 0));
 
