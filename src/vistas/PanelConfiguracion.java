@@ -25,6 +25,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 
+import controladores.ControladorConfiguracion;
+import entidades.Tracker;
 import utilidades.Propiedades;
 import vistas.componentes.IFileChooser;
 import vistas.componentes.ITextField;
@@ -53,8 +55,10 @@ public class PanelConfiguracion extends JPanel {
 	private JLabel							lblEstado;
 	private JLabel							lblEstadoActual;
 	private JLabel							lblRutaBaseDatos;
-	private JPanel							IFileChooser;
 	private vistas.componentes.IFileChooser	panFileChooser;
+
+	private int								cont				= 0;
+	private ControladorConfiguracion		cc;
 
 	public PanelConfiguracion() {
 		setOpaque(false);
@@ -269,6 +273,8 @@ public class PanelConfiguracion extends JPanel {
 		gbc_btnResetear.gridy = 0;
 		panBotonera.add(btnResetear, gbc_btnResetear);
 
+		cc = new ControladorConfiguracion();
+
 		btnConectar = new JButton("Establecer conexi\u00F3n");
 		GridBagConstraints gbc_btnConectar = new GridBagConstraints();
 		gbc_btnConectar.anchor = GridBagConstraints.EAST;
@@ -278,7 +284,69 @@ public class PanelConfiguracion extends JPanel {
 		btnConectar.setForeground(Color.BLACK);
 		btnConectar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				PanelConfiguracion.this.guardar();
+
+				if (btnConectar.getText().trim()
+						.equals("Establecer conexi\u00F3n")) {
+					if (PanelConfiguracion.this.guardar().equals("")) {
+						// Ejemplo de interacción entre clase y uso de los
+						// patrones
+						// Observable/Observer.
+						boolean master = false;
+
+						if (cont == 0)
+							master = true;
+						else
+							master = false;
+
+						Tracker t = new Tracker(cont, master,
+								txtIP.getText().trim(), Integer.parseInt(
+										txtPuertoTrackers.getText().trim()));
+
+						cont++;
+
+						cc.conectarTracker(t);
+
+						/*
+						 * Modificamos el estado de la conexión y el nombre del
+						 * botón a desconectar (para poder forzar el fallo desde
+						 * la aplicación)
+						 */
+						lblEstadoActual.setText("Conectado");
+						lblEstadoActual.setForeground(new Color(0, 153, 0));
+
+						btnConectar.setText("Desconectar");
+					}
+				} else {
+					JOptionPane.showMessageDialog(Ventana.getInstance(),
+							"Se acaba de desconectar el tracker.",
+							"Tracker desconectado",
+							JOptionPane.INFORMATION_MESSAGE);
+
+					// Continuamos con el ejemplo en el que se desconectar al
+					// tracker conectado con los
+					// valores de los campos del formulario al darle a
+					// desconectar (es un ejemplo de
+					// prueba).
+					boolean master = false;
+
+					if (cont-- != 0)
+						master = false;
+					else
+						master = true;
+
+					Tracker t = new Tracker(cont--, master,
+							txtIP.getText().trim(), Integer.parseInt(
+									txtPuertoTrackers.getText().trim()));
+
+					cc.desconectarTracker(t);
+
+					// Restauramos los valores del boton y del label de estado
+					// actual.
+					lblEstadoActual.setText("Desconectado");
+					lblEstadoActual.setForeground(new Color(220, 20, 60));
+
+					btnConectar.setText("Establecer conexi\u00F3n");
+				}
 			}
 		});
 
