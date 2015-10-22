@@ -5,17 +5,26 @@ import modelos.GestorTrackers;
 
 public class ControladorConfiguracion {
 
-	private GestorTrackers gt = GestorTrackers.ObtenerInstancia();
-
 	public ControladorConfiguracion() {
 
 	}
 
 	public void conectarTracker(Tracker t) {
-		gt.NuevoTracker(t);
+		GestorTrackers.ObtenerInstancia().NuevoTracker(t);
+		GestorTrackers.ObtenerInstancia().setEnable(true);
 	}
 
 	public void desconectarTracker(Tracker t) {
-		gt.BorrarTracker(t);
+		GestorTrackers.ObtenerInstancia().BorrarTracker(
+				GestorTrackers.ObtenerInstancia().ObtenerTrackers().get(0));
+		GestorTrackers.ObtenerInstancia().setEnable(false);
+	}
+
+	public boolean estaConectado() {
+		return GestorTrackers.ObtenerInstancia().isEnable();
+	}
+
+	public int numeroTrackers() {
+		return GestorTrackers.ObtenerInstancia().getTotalTrackers();
 	}
 }

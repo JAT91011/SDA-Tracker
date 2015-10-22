@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 
 import javax.swing.UIManager;
 
+import utilidades.LogErrores;
 import utilidades.Propiedades;
 import vistas.PanelPestanas;
 import vistas.Ventana;
@@ -18,6 +19,10 @@ public class Aplicacion {
 					Ventana.getInstance().setContentPane(new PanelPestanas());
 					Ventana.getInstance().setVisible(true);
 				} catch (Exception e) {
+					LogErrores.getInstance().writeLog(this.getClass().getName(),
+							new Object() {
+					}.getClass().getEnclosingMethod().getName(),
+							e.getMessage());
 					e.printStackTrace();
 				}
 			}

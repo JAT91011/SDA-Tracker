@@ -103,6 +103,18 @@ public class GestorTrackers extends Observable implements Runnable {
 		}
 	}
 
+	public boolean isEnable() {
+		return enable;
+	}
+
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+	}
+
+	public int getTotalTrackers() {
+		return trackers.size();
+	}
+
 	public static GestorTrackers ObtenerInstancia() {
 		if (instance == null) {
 			instance = new GestorTrackers();

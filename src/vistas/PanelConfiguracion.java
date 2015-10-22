@@ -57,7 +57,6 @@ public class PanelConfiguracion extends JPanel {
 	private JLabel							lblRutaBaseDatos;
 	private vistas.componentes.IFileChooser	panFileChooser;
 
-	private int								cont				= 0;
 	private ControladorConfiguracion		cc;
 
 	public PanelConfiguracion() {
@@ -129,7 +128,6 @@ public class PanelConfiguracion extends JPanel {
 		gbc_txtIP.gridx = 1;
 		gbc_txtIP.gridy = 1;
 		panAjustes.add(txtIP, gbc_txtIP);
-		txtIP.setForeground(Color.BLACK);
 		txtIP.setFont(new Font("Dialog", Font.PLAIN, 14));
 
 		JLabel lblPuertoTrackers = new JLabel("Puerto trackers:");
@@ -284,32 +282,22 @@ public class PanelConfiguracion extends JPanel {
 		btnConectar.setForeground(Color.BLACK);
 		btnConectar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-
-				if (btnConectar.getText().trim()
-						.equals("Establecer conexi\u00F3n")) {
+				System.out.println("Pulsa");
+				System.out.println(cc.estaConectado());
+				if (!cc.estaConectado()) {
 					if (PanelConfiguracion.this.guardar().equals("")) {
-						// Ejemplo de interacción entre clase y uso de los
+						// Ejemplo de interacciï¿½n entre clase y uso de los
 						// patrones
 						// Observable/Observer.
-						boolean master = false;
-
-						if (cont == 0)
-							master = true;
-						else
-							master = false;
-
-						Tracker t = new Tracker(cont, master,
+						cc.conectarTracker(new Tracker(cc.numeroTrackers() + 1,
+								cc.numeroTrackers() == 0,
 								txtIP.getText().trim(), Integer.parseInt(
-										txtPuertoTrackers.getText().trim()));
-
-						cont++;
-
-						cc.conectarTracker(t);
+										txtPuertoTrackers.getText().trim())));
 
 						/*
-						 * Modificamos el estado de la conexión y el nombre del
-						 * botón a desconectar (para poder forzar el fallo desde
-						 * la aplicación)
+						 * Modificamos el estado de la conexiï¿½n y el nombre del
+						 * botï¿½n a desconectar (para poder forzar el fallo desde
+						 * la aplicaciï¿½n)
 						 */
 						lblEstadoActual.setText("Conectado");
 						lblEstadoActual.setForeground(new Color(0, 153, 0));
@@ -327,14 +315,8 @@ public class PanelConfiguracion extends JPanel {
 					// valores de los campos del formulario al darle a
 					// desconectar (es un ejemplo de
 					// prueba).
-					boolean master = false;
 
-					if (cont-- != 0)
-						master = false;
-					else
-						master = true;
-
-					Tracker t = new Tracker(cont--, master,
+					Tracker t = new Tracker(cc.numeroTrackers(), true,
 							txtIP.getText().trim(), Integer.parseInt(
 									txtPuertoTrackers.getText().trim()));
 
