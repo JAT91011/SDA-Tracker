@@ -3,6 +3,7 @@ package vistas.componentes;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -38,11 +39,13 @@ public class IFileChooser extends JPanel {
 
 		file = new File(Propiedades.getRutaBaseDatos());
 		textFieldPath = new ITextField("");
+		textFieldPath.setFont(new Font("Calibri", Font.PLAIN, 14));
 		textFieldPath.setText(Propiedades.getRutaBaseDatos());
 		textFieldPath.setFocusable(false);
 		textFieldPath.setEditable(false);
 		textFieldPath.setErrorIcon(new ImageIcon("icons/error-icon.png"));
 		GridBagConstraints gbc_textFieldRuta = new GridBagConstraints();
+		gbc_textFieldRuta.insets = new Insets(3, 0, 3, 0);
 		gbc_textFieldRuta.fill = GridBagConstraints.BOTH;
 		gbc_textFieldRuta.gridx = 0;
 		gbc_textFieldRuta.gridy = 0;
@@ -74,6 +77,11 @@ public class IFileChooser extends JPanel {
 		return file;
 	}
 
+	public void setFile(File file) {
+		this.file = file;
+		this.textFieldPath.setText(file.getPath());
+	}
+
 	public void setButtonIcon(ImageIcon icon) {
 		btnExaminar.setText("");
 		btnExaminar.setIcon(icon);
@@ -86,6 +94,10 @@ public class IFileChooser extends JPanel {
 	public void reset() {
 		textFieldPath.setText("");
 		file = null;
+	}
+
+	public void setEnable(boolean enable) {
+		btnExaminar.setEnabled(enable);
 	}
 
 	public void setErrorVisible(boolean visible) {

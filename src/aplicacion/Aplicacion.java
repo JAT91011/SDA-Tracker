@@ -21,8 +21,7 @@ public class Aplicacion {
 				} catch (Exception e) {
 					LogErrores.getInstance().writeLog(this.getClass().getName(),
 							new Object() {
-					}.getClass().getEnclosingMethod().getName(),
-							e.getMessage());
+					}.getClass().getEnclosingMethod().getName(), e.toString());
 					e.printStackTrace();
 				}
 			}

@@ -9,12 +9,12 @@ public class ControladorConfiguracion {
 
 	}
 
-	public void conectarTracker(Tracker t) {
+	public void conectar(Tracker t) {
 		GestorTrackers.ObtenerInstancia().NuevoTracker(t);
 		GestorTrackers.ObtenerInstancia().setEnable(true);
 	}
 
-	public void desconectarTracker(Tracker t) {
+	public void desconectar() {
 		GestorTrackers.ObtenerInstancia().BorrarTracker(
 				GestorTrackers.ObtenerInstancia().ObtenerTrackers().get(0));
 		GestorTrackers.ObtenerInstancia().setEnable(false);

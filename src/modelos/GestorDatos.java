@@ -7,4 +7,16 @@ package modelos;
 
 public class GestorDatos {
 
+	private static GestorDatos instance;
+
+	private GestorDatos() {
+
+	}
+
+	public static GestorDatos ObtenerInstancia() {
+		if (instance == null) {
+			instance = new GestorDatos();
+		}
+		return instance;
+	}
 }

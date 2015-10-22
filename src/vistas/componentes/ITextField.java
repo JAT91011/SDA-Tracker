@@ -12,13 +12,13 @@ import javax.swing.border.EmptyBorder;
 
 public class ITextField extends JTextField implements FocusListener {
 
-	private String	hint;
-	private boolean	showingHint;
-	private Icon	icon;
-	private Icon	errorIcon;
-	private boolean	showError;
+	private String				hint;
+	private boolean				showingHint;
+	private Icon				icon;
+	private Icon				errorIcon;
+	private boolean				showError;
 
-	private static final long serialVersionUID = 5728251792417526726L;
+	private static final long	serialVersionUID	= 5728251792417526726L;
 
 	/**
 	 * @param hint
@@ -28,7 +28,7 @@ public class ITextField extends JTextField implements FocusListener {
 	 */
 	public ITextField(String hint) {
 		super(hint);
-		setOpaque(false);
+		setOpaque(true);
 		this.hint = hint;
 		this.showingHint = true;
 		this.setFont(new Font("Calibri", Font.PLAIN, 20));
@@ -62,7 +62,7 @@ public class ITextField extends JTextField implements FocusListener {
 	 *            Change the text as hint text
 	 */
 	public void showAsHint(boolean hint) {
-		this.showingHint = true;
+		this.showingHint = hint;
 	}
 
 	/**
