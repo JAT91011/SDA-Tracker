@@ -9,7 +9,8 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # Data folder BitTorrent project
-/data
+data/config.properties
+data/errores/
 
 # Windows Installer files
 *.cab
