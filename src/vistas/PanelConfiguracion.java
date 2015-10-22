@@ -31,25 +31,24 @@ import vistas.componentes.ITextField;
 
 public class PanelConfiguracion extends JPanel {
 
-	private static final long	serialVersionUID	= 4959247560481979942L;
-	private ITextField			txtIP;
-	private ITextField			txtPuertoTrackers;
-	private ITextField			txtPuertoPeers;
-	private JButton				btnGuardar;
-	private JLabel				lblApariencia;
-	private JComboBox<String>	cboApariencia;
+	private static final long				serialVersionUID	= 4959247560481979942L;
+	private ITextField						txtIP;
+	private ITextField						txtPuertoTrackers;
+	private ITextField						txtPuertoPeers;
+	private JButton							btnConectar;
+	private JLabel							lblApariencia;
+	private JComboBox<String>				cboApariencia;
 
-	private HashMap<String, String>	lookNFeelHashMap;
-	private String					currentLookAndFeel;
+	private HashMap<String, String>			lookNFeelHashMap;
+	private String							currentLookAndFeel;
 
-	private static String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+	private static String					IPADDRESS_PATTERN	= "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	private JLabel							lblPuertoPeers;
 	private JPanel							panAjustes;
-	private JButton							btnConectar;
 	private JButton							btnResetear;
 	private JLabel							lblEstado;
 	private JLabel							lblEstadoActual;
@@ -271,28 +270,19 @@ public class PanelConfiguracion extends JPanel {
 		panBotonera.add(btnResetear, gbc_btnResetear);
 
 		btnConectar = new JButton("Establecer conexi\u00F3n");
-		btnConectar.setForeground(Color.BLACK);
-		btnConectar.setFont(new Font("Dialog", Font.PLAIN, 14));
 		GridBagConstraints gbc_btnConectar = new GridBagConstraints();
-		gbc_btnConectar.insets = new Insets(0, 0, 0, 5);
-		gbc_btnConectar.gridx = 1;
+		gbc_btnConectar.anchor = GridBagConstraints.EAST;
+		gbc_btnConectar.gridx = 2;
 		gbc_btnConectar.gridy = 0;
 		panBotonera.add(btnConectar, gbc_btnConectar);
-
-		btnGuardar = new JButton("Guardar");
-		GridBagConstraints gbc_btnGuardar = new GridBagConstraints();
-		gbc_btnGuardar.anchor = GridBagConstraints.EAST;
-		gbc_btnGuardar.gridx = 2;
-		gbc_btnGuardar.gridy = 0;
-		panBotonera.add(btnGuardar, gbc_btnGuardar);
-		btnGuardar.setForeground(Color.BLACK);
-		btnGuardar.addActionListener(new ActionListener() {
+		btnConectar.setForeground(Color.BLACK);
+		btnConectar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				PanelConfiguracion.this.guardar();
 			}
 		});
 
-		btnGuardar.setFont(new Font("Dialog", Font.PLAIN, 14));
+		btnConectar.setFont(new Font("Dialog", Font.PLAIN, 14));
 	}
 
 	private Vector<String> getAvailableLF() {
