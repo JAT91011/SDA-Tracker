@@ -1,0 +1,4 @@
+[16:39:29] -->	Clase:		GestorDatos
+				Función:	CrearBaseDatos()
+				Detalles:	No funciona porque está mal.
+
