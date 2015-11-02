@@ -10,6 +10,7 @@ public class ControladorConfiguracion {
 
 	public void conectar(final String ip, final int port) {
 		boolean connected = GestorTrackers.getInstance().connect(ip, port);
+		GestorTrackers.getInstance().start();
 		if (connected) {
 			GestorTrackers.getInstance().start();
 		} else {
@@ -18,8 +19,7 @@ public class ControladorConfiguracion {
 	}
 
 	public void desconectar() {
-		GestorTrackers.getInstance().removeTracker(GestorTrackers.getInstance().getTrackers().get(0));
-		GestorTrackers.getInstance().setEnable(false);
+		GestorTrackers.getInstance().disconnect();
 	}
 
 	public boolean estaConectado() {

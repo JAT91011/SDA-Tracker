@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Vector;
 
@@ -44,7 +45,7 @@ public class GestorTrackers extends Observable implements Runnable {
 		this.enable = false;
 		this.trackers = new Vector<Tracker>();
 
-		this.timerKeepAlive = new Timer(1900, new ActionListener() {
+		this.timerKeepAlive = new Timer(2000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				while (isWriting)
 					;
@@ -95,6 +96,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.timerKeepAlive.stop();
 			this.socket.leaveGroup(group);
 			this.enable = false;
+			this.removeTrackers();
 			return this.socket.isClosed();
 		} catch (IOException e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
@@ -110,9 +112,9 @@ public class GestorTrackers extends Observable implements Runnable {
 	 * @return La primera ID disponible
 	 */
 	public int getAvailableId() {
-		int id = 0;
+		int id = 1;
 		boolean enc = false;
-		for (id = 0; id < Integer.MAX_VALUE; id++) {
+		for (id = 1; id < Integer.MAX_VALUE; id++) {
 			for (Tracker tracker : trackers) {
 				if (tracker.getId() == id) {
 					enc = true;
@@ -148,6 +150,19 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public void removeTracker(Tracker tracker) {
 		this.trackers.remove(tracker);
+		setChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * Funcion para notificar que se ha desconectado el tracker operativo
+	 * tracker
+	 * 
+	 * @param tracker
+	 *            Tracker que se ha desconectado
+	 */
+	public void removeTrackers() {
+		this.trackers.removeAllElements();
 		setChanged();
 		notifyObservers();
 	}
@@ -207,7 +222,10 @@ public class GestorTrackers extends Observable implements Runnable {
 				break;
 
 			case 6: // KEEP_ALIVE
-				int idTracker = (int) data[4];
+				int id = ByteBuffer.wrap(Arrays.copyOfRange(data, 16, 20)).getInt();
+				trackers.firstElement().setLastKeepAlive(new Date());
+				setTracker(trackers.firstElement());
+				System.out.println("ID Recibida: " + id);
 				break;
 
 			case 99: // ERR
