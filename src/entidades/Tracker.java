@@ -6,8 +6,6 @@ public class Tracker {
 
 	private int		id;
 	private boolean	master;
-	private String	ip;
-	private int		puerto;
 	private Date	lastKeepAlive;
 	private long	differenceBetweenKeepAlive;
 
@@ -15,11 +13,9 @@ public class Tracker {
 
 	}
 
-	public Tracker(int id, boolean master, String ip, int puerto) {
+	public Tracker(int id, boolean master) {
 		this.id = id;
 		this.master = master;
-		this.ip = ip;
-		this.puerto = puerto;
 		this.lastKeepAlive = null;
 		this.differenceBetweenKeepAlive = 0;
 	}
@@ -38,22 +34,6 @@ public class Tracker {
 
 	public void setMaster(boolean master) {
 		this.master = master;
-	}
-
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
-
-	public int getPuerto() {
-		return puerto;
-	}
-
-	public void setPuerto(int puerto) {
-		this.puerto = puerto;
 	}
 
 	public Date getLastKeepAlive() {

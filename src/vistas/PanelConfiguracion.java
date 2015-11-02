@@ -310,11 +310,12 @@ public class PanelConfiguracion extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				if (!controladorConfiguracion.estaConectado()) {
 					if (PanelConfiguracion.this.guardar().equals("")) {
-						controladorConfiguracion.conectar(new Tracker(
-								controladorConfiguracion.numeroTrackers() + 1,
-								controladorConfiguracion.numeroTrackers() == 0,
-								txtIP.getText().trim(), Integer.parseInt(
-										txtPuertoTrackers.getText().trim())));
+						controladorConfiguracion
+								.conectar(new Tracker(
+										controladorConfiguracion
+												.numeroTrackers() + 1,
+										controladorConfiguracion
+												.numeroTrackers() == 0));
 
 						lblEstadoActual.setText("Conectado");
 						lblEstadoActual.setForeground(new Color(0, 153, 0));

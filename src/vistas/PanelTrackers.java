@@ -68,13 +68,13 @@ public class PanelTrackers extends JPanel implements Observer {
 		tablaTrackers.getTableHeader()
 				.setFont(new Font("Arial", Font.PLAIN, 15));
 
-		GestorTrackers.ObtenerInstancia().addObserver(this);
+		GestorTrackers.getInstance().addObserver(this);
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (o == GestorTrackers.ObtenerInstancia()) {
-			Vector<Tracker> trackers = GestorTrackers.ObtenerInstancia()
+		if (o == GestorTrackers.getInstance()) {
+			Vector<Tracker> trackers = GestorTrackers.getInstance()
 					.ObtenerTrackers();
 			String[][] contenido = new String[trackers.size()][header.length];
 			for (int i = 0; i < trackers.size(); i++) {

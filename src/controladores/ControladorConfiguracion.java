@@ -10,21 +10,21 @@ public class ControladorConfiguracion {
 	}
 
 	public void conectar(Tracker t) {
-		GestorTrackers.ObtenerInstancia().NuevoTracker(t);
-		GestorTrackers.ObtenerInstancia().setEnable(true);
+		GestorTrackers.getInstance().NuevoTracker(t);
+		GestorTrackers.getInstance().setEnable(true);
 	}
 
 	public void desconectar() {
-		GestorTrackers.ObtenerInstancia().BorrarTracker(
-				GestorTrackers.ObtenerInstancia().ObtenerTrackers().get(0));
-		GestorTrackers.ObtenerInstancia().setEnable(false);
+		GestorTrackers.getInstance().BorrarTracker(
+				GestorTrackers.getInstance().ObtenerTrackers().get(0));
+		GestorTrackers.getInstance().setEnable(false);
 	}
 
 	public boolean estaConectado() {
-		return GestorTrackers.ObtenerInstancia().isEnable();
+		return GestorTrackers.getInstance().isEnable();
 	}
 
 	public int numeroTrackers() {
-		return GestorTrackers.ObtenerInstancia().getTotalTrackers();
+		return GestorTrackers.getInstance().getTotalTrackers();
 	}
 }
