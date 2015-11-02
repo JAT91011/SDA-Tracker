@@ -21,9 +21,11 @@ public class GestorTrackers extends Observable implements Runnable {
 	private static GestorTrackers	instance;
 
 	private boolean					enable;
-	private boolean					isReading;
+	private boolean					isWriting;
 	private Tracker					currentTracker;
 	private Vector<Tracker>			trackers;
+
+	private Thread					readingThread;
 
 	private MulticastSocket			socket;
 	private InetAddress				group;
@@ -49,6 +51,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.socket = new MulticastSocket(port);
 			this.group = InetAddress.getByName(ip);
 			this.socket.joinGroup(group);
+			this.enable = true;
 			return this.socket.isConnected();
 		} catch (IOException e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(),
@@ -67,6 +70,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	public boolean disconnect() {
 		try {
 			this.socket.leaveGroup(group);
+			this.enable = false;
 			return this.socket.isClosed();
 		} catch (IOException e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(),
@@ -189,19 +193,29 @@ public class GestorTrackers extends Observable implements Runnable {
 		}
 	}
 
+	public void start() {
+		try {
+			readingThread = new Thread(this);
+			readingThread.start();
+		} catch (Exception e) {
+			LogErrores.getInstance().writeLog(this.getClass().getName(),
+					new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.toString());
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Hilo principal para procesar y enviar informacion a los trackers
 	 */
 	@Override
 	public void run() {
 		try {
-			while (true) {
-				while (this.enable) {
-					this.buffer = new byte[32];
-					this.messageIn = new DatagramPacket(buffer, buffer.length);
-					this.socket.receive(messageIn);
-					processData(this.buffer);
-				}
+			while (this.enable) {
+				this.buffer = new byte[32];
+				this.messageIn = new DatagramPacket(buffer, buffer.length);
+				this.socket.receive(messageIn);
+				processData(this.buffer);
 			}
 		} catch (Exception e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(),
@@ -233,12 +247,15 @@ public class GestorTrackers extends Observable implements Runnable {
 	public static void main(String[] strings) {
 		boolean connect = GestorTrackers.getInstance().connect("228.5.6.7",
 				9000);
-		if (!connect) {
-			System.out.println("No conectado");
-		} else {
-			GestorTrackers.getInstance()
-					.sendData(new String("hola").getBytes());
-		}
-	}
+		// if (!connect) {
+		// System.out.println("No conectado");
+		// } else {
+		// GestorTrackers.getInstance()
+		// .sendData(new String("hola").getBytes());
+		// }
 
+		GestorTrackers.getInstance().start();
+		GestorTrackers.getInstance().sendData(new String("hola").getBytes());
+		GestorTrackers.getInstance().disconnect();
+	}
 }
