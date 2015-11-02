@@ -18,6 +18,8 @@ import utilidades.LogErrores;
 
 public class GestorTrackers extends Observable implements Runnable {
 
+	private String					ip;
+	private int						port;
 	private static GestorTrackers	instance;
 
 	private boolean					enable;
@@ -48,6 +50,8 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public boolean connect(final String ip, final int port) {
 		try {
+			this.ip = ip;
+			this.port = port;
 			this.socket = new MulticastSocket(port);
 			this.group = InetAddress.getByName(ip);
 			this.socket.joinGroup(group);
@@ -182,8 +186,9 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public void sendData(byte[] data) {
 		try {
+			System.out.println("Puertoooo: " + this.port);
 			DatagramPacket message = new DatagramPacket(data, data.length,
-					group, this.socket.getPort());
+					group, this.port);
 			socket.send(message);
 		} catch (IOException e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(),
@@ -246,16 +251,14 @@ public class GestorTrackers extends Observable implements Runnable {
 
 	public static void main(String[] strings) {
 		boolean connect = GestorTrackers.getInstance().connect("228.5.6.7",
-				9000);
-		// if (!connect) {
-		// System.out.println("No conectado");
-		// } else {
-		// GestorTrackers.getInstance()
-		// .sendData(new String("hola").getBytes());
-		// }
-
-		GestorTrackers.getInstance().start();
-		GestorTrackers.getInstance().sendData(new String("hola").getBytes());
-		GestorTrackers.getInstance().disconnect();
+				5000);
+		if (!connect) {
+			System.out.println("No conectado");
+		} else {
+			GestorTrackers.getInstance().start();
+			GestorTrackers.getInstance()
+					.sendData(new String("hola").getBytes());
+		}
+		// GestorTrackers.getInstance().disconnect();
 	}
 }
