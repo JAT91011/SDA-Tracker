@@ -26,7 +26,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 
 import controladores.ControladorConfiguracion;
-import entidades.Tracker;
 import utilidades.Propiedades;
 import vistas.componentes.IFileChooser;
 import vistas.componentes.ITextField;
@@ -310,12 +309,9 @@ public class PanelConfiguracion extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				if (!controladorConfiguracion.estaConectado()) {
 					if (PanelConfiguracion.this.guardar().equals("")) {
-						controladorConfiguracion
-								.conectar(new Tracker(
-										controladorConfiguracion
-												.numeroTrackers() + 1,
-										controladorConfiguracion
-												.numeroTrackers() == 0));
+						controladorConfiguracion.conectar(
+								txtIP.getText().trim(), Integer.parseInt(
+										txtPuertoTrackers.getText().trim()));
 
 						lblEstadoActual.setText("Conectado");
 						lblEstadoActual.setForeground(new Color(0, 153, 0));

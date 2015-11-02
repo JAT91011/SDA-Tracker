@@ -1,6 +1,5 @@
 package controladores;
 
-import entidades.Tracker;
 import modelos.GestorTrackers;
 
 public class ControladorConfiguracion {
@@ -9,14 +8,17 @@ public class ControladorConfiguracion {
 
 	}
 
-	public void conectar(Tracker t) {
-		GestorTrackers.getInstance().NuevoTracker(t);
-		GestorTrackers.getInstance().setEnable(true);
+	public void conectar(final String ip, final int port) {
+		boolean connected = GestorTrackers.getInstance().connect(ip, port);
+		if (connected) {
+			GestorTrackers.getInstance().start();
+		} else {
+			// TODO Mostrar aviso
+		}
 	}
 
 	public void desconectar() {
-		GestorTrackers.getInstance().BorrarTracker(
-				GestorTrackers.getInstance().ObtenerTrackers().get(0));
+		GestorTrackers.getInstance().removeTracker(GestorTrackers.getInstance().getTrackers().get(0));
 		GestorTrackers.getInstance().setEnable(false);
 	}
 

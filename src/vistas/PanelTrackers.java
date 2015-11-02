@@ -65,8 +65,7 @@ public class PanelTrackers extends JPanel implements Observer {
 		tablaTrackers.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 14));
 		tablaTrackers.setRowHeight(30);
 
-		tablaTrackers.getTableHeader()
-				.setFont(new Font("Arial", Font.PLAIN, 15));
+		tablaTrackers.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 15));
 
 		GestorTrackers.getInstance().addObserver(this);
 	}
@@ -74,8 +73,7 @@ public class PanelTrackers extends JPanel implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		if (o == GestorTrackers.getInstance()) {
-			Vector<Tracker> trackers = GestorTrackers.getInstance()
-					.ObtenerTrackers();
+			Vector<Tracker> trackers = GestorTrackers.getInstance().getTrackers();
 			String[][] contenido = new String[trackers.size()][header.length];
 			for (int i = 0; i < trackers.size(); i++) {
 				contenido[i][0] = Integer.toString(trackers.get(i).getId());
@@ -84,9 +82,7 @@ public class PanelTrackers extends JPanel implements Observer {
 				} else {
 					contenido[i][1] = "Esclavo";
 				}
-				contenido[i][2] = Long.toString(
-						trackers.get(i).getDifferenceBetweenKeepAlive())
-						+ " segundos";
+				contenido[i][2] = Long.toString(trackers.get(i).getDifferenceBetweenKeepAlive()) + " segundos";
 			}
 			modelTable.setDataVector(contenido, header);
 			tablaTrackers.setModel(modelTable);

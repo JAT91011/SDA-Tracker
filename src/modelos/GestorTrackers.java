@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Vector;
@@ -45,7 +46,11 @@ public class GestorTrackers extends Observable implements Runnable {
 
 		this.timerKeepAlive = new Timer(1900, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				sendData(new String("Sigo vivo").getBytes());
+				while (isWriting)
+					;
+				isWriting = true;
+				sendData(createDatagram((byte) 0x06, ByteBuffer.allocate(4).putInt(currentTracker.getId()).array())[0]);
+				isWriting = false;
 			}
 		});
 	}
@@ -63,15 +68,18 @@ public class GestorTrackers extends Observable implements Runnable {
 		try {
 			this.ip = ip;
 			this.port = port;
-			this.socket = new MulticastSocket(this.port);
+
+			this.currentTracker = new Tracker(getAvailableId(), this.trackers.size() == 0);
+			addTracker(currentTracker);
+
+			this.socket = new MulticastSocket(port);
 			this.group = InetAddress.getByName(this.ip);
 			this.socket.joinGroup(group);
 			this.enable = true;
 			return this.socket.isConnected();
 		} catch (IOException e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(),
-					new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.toString());
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 			return false;
 		}
@@ -84,13 +92,13 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public boolean disconnect() {
 		try {
+			this.timerKeepAlive.stop();
 			this.socket.leaveGroup(group);
 			this.enable = false;
 			return this.socket.isClosed();
 		} catch (IOException e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(),
-					new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.toString());
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 			return false;
 		}
@@ -111,8 +119,7 @@ public class GestorTrackers extends Observable implements Runnable {
 					break;
 				}
 			}
-			if (!enc && (currentTracker == null
-					|| currentTracker.getId() != id)) {
+			if (!enc && (currentTracker == null || currentTracker.getId() != id)) {
 				// if (currentTracker == null) {
 				// return id;
 				// } else if (currentTracker.getId() != id) {
@@ -127,7 +134,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	/**
 	 * Funcion para notificar que se ha insertado un nuevo tracker
 	 */
-	public void NuevoTracker(Tracker tracker) {
+	public void addTracker(Tracker tracker) {
 		this.trackers.addElement(tracker);
 		setChanged();
 		notifyObservers();
@@ -139,7 +146,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	 * @param tracker
 	 *            Tracker que se ha desconectado
 	 */
-	public void BorrarTracker(Tracker tracker) {
+	public void removeTracker(Tracker tracker) {
 		this.trackers.remove(tracker);
 		setChanged();
 		notifyObservers();
@@ -150,7 +157,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	 * 
 	 * @param tracker
 	 */
-	public void ModificarTracker(Tracker tracker) {
+	public void setTracker(Tracker tracker) {
 		this.trackers.set(this.trackers.indexOf(tracker), tracker);
 		setChanged();
 		notifyObservers();
@@ -161,7 +168,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	 * 
 	 * @return Vector con los trackers activos
 	 */
-	public Vector<Tracker> ObtenerTrackers() {
+	public Vector<Tracker> getTrackers() {
 		return instance.trackers;
 	}
 
@@ -172,7 +179,43 @@ public class GestorTrackers extends Observable implements Runnable {
 	 *            Datos recibidos
 	 */
 	public void processData(final byte[] data) {
-		System.out.println("Datos recividos: " + Arrays.toString(data));
+		int code = ByteBuffer.wrap(Arrays.copyOfRange(data, 0, 4)).getInt();
+		System.out.println("Codigo recibido: " + code);
+		switch (code) {
+			case 0: // OK
+
+				break;
+
+			case 1: // GET_DATA
+
+				break;
+
+			case 2: // REPLICATION
+
+				break;
+
+			case 3: // READY_TO_SAVE
+
+				break;
+
+			case 4: // SAVE_DATA
+
+				break;
+
+			case 5: // DO_NOT_SAVE_DATA
+
+				break;
+
+			case 6: // KEEP_ALIVE
+				int idTracker = (int) data[4];
+				break;
+
+			case 99: // ERR
+
+				break;
+		}
+
+		System.out.println("Datos recibidos: " + Arrays.toString(data));
 	}
 
 	/**
@@ -185,8 +228,70 @@ public class GestorTrackers extends Observable implements Runnable {
 	 * @return Array con la trama formateada se utiliza un array bidimensional
 	 *         dado que la trama puede estar particionada
 	 */
-	public byte[][] CrearTrama(int codigo, String datos) {
-		return new byte[0][0];
+	public byte[][] createDatagram(int code, byte[] data) {
+		int length = data.length;
+		int partitions = 0;
+		if (length < 48) {
+			partitions = 1;
+		} else {
+			partitions = length / 48;
+		}
+
+		System.out.println("Data: " + Arrays.toString(data));
+
+		byte[][] datagrams = new byte[partitions][64];
+		for (int i = 0; i < partitions; i++) {
+
+			// CODE
+			byte[] codeArray = ByteBuffer.allocate(4).putInt(code).array();
+			datagrams[i][0] = codeArray[0];
+			datagrams[i][1] = codeArray[1];
+			datagrams[i][2] = codeArray[2];
+			datagrams[i][3] = codeArray[3];
+
+			// PARTITIONS
+			byte[] codePartitions = ByteBuffer.allocate(4).putInt(partitions).array();
+			datagrams[i][4] = codePartitions[0];
+			datagrams[i][5] = codePartitions[1];
+			datagrams[i][6] = codePartitions[2];
+			datagrams[i][7] = codePartitions[3];
+
+			// CURRENT PARTITION
+			byte[] codeCurrentPartition = ByteBuffer.allocate(4).putInt(i + 1).array();
+			datagrams[i][8] = codeCurrentPartition[0];
+			datagrams[i][9] = codeCurrentPartition[1];
+			datagrams[i][10] = codeCurrentPartition[2];
+			datagrams[i][11] = codeCurrentPartition[3];
+
+			// LENGTH
+			if (i + 1 == partitions) {
+				byte[] lengthArray = ByteBuffer.allocate(4).putInt(length).array();
+				datagrams[i][12] = lengthArray[0];
+				datagrams[i][13] = lengthArray[1];
+				datagrams[i][14] = lengthArray[2];
+				datagrams[i][15] = lengthArray[3];
+				for (int j = 0; j < length; j++) {
+					datagrams[i][16 + j] = data[j];
+				}
+			} else {
+				byte[] lengthArray = ByteBuffer.allocate(4).putInt(48).array();
+				datagrams[i][12] = lengthArray[0];
+				datagrams[i][13] = lengthArray[1];
+				datagrams[i][14] = lengthArray[2];
+				datagrams[i][15] = lengthArray[3];
+				for (int j = 0; j < 48; j++) {
+					datagrams[i][16 + j] = data[j];
+				}
+			}
+
+		}
+
+		System.out.println("Datagrama creado");
+		for (int i = 0; i < partitions; i++) {
+			System.out.println("Datagrama " + (i + 1) + ": " + Arrays.toString(datagrams[i]));
+		}
+
+		return datagrams;
 	}
 
 	/**
@@ -197,14 +302,11 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public void sendData(byte[] data) {
 		try {
-			System.out.println("Puertoooo: " + this.port);
-			DatagramPacket message = new DatagramPacket(data, data.length,
-					group, this.port);
+			DatagramPacket message = new DatagramPacket(data, data.length, group, this.port);
 			socket.send(message);
 		} catch (IOException e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(),
-					new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.toString());
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -215,9 +317,8 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.readingThread = new Thread(this);
 			this.readingThread.start();
 		} catch (Exception e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(),
-					new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.toString());
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -229,15 +330,14 @@ public class GestorTrackers extends Observable implements Runnable {
 	public void run() {
 		try {
 			while (this.enable) {
-				this.buffer = new byte[32];
+				this.buffer = new byte[64];
 				this.messageIn = new DatagramPacket(buffer, buffer.length);
 				this.socket.receive(messageIn);
 				processData(this.buffer);
 			}
 		} catch (Exception e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(),
-					new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.toString());
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -262,15 +362,14 @@ public class GestorTrackers extends Observable implements Runnable {
 	}
 
 	public static void main(String[] strings) {
-		boolean connect = GestorTrackers.getInstance().connect("228.5.6.7",
-				5000);
-		if (!connect) {
-			System.out.println("No conectado");
-		} else {
-			GestorTrackers.getInstance().start();
-			GestorTrackers.getInstance()
-					.sendData(new String("hola").getBytes());
-		}
+		boolean connect = GestorTrackers.getInstance().connect("228.5.6.7", 5000);
+		GestorTrackers.getInstance().start();
+		// if (!connect) {
+		// System.out.println("No conectado");
+		// } else {
+		// GestorTrackers.getInstance().start();
+		// GestorTrackers.getInstance().sendData(new String("hola").getBytes());
+		// }
 		// GestorTrackers.getInstance().disconnect();
 	}
 }
