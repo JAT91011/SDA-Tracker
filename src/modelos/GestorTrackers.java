@@ -1,5 +1,7 @@
 package modelos;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -7,6 +9,8 @@ import java.net.MulticastSocket;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Vector;
+
+import javax.swing.Timer;
 
 import entidades.Tracker;
 import utilidades.LogErrores;
@@ -28,6 +32,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	private Vector<Tracker>			trackers;
 
 	private Thread					readingThread;
+	private Timer					timerKeepAlive;
 
 	private MulticastSocket			socket;
 	private InetAddress				group;
@@ -37,6 +42,12 @@ public class GestorTrackers extends Observable implements Runnable {
 	private GestorTrackers() {
 		this.enable = false;
 		this.trackers = new Vector<Tracker>();
+
+		this.timerKeepAlive = new Timer(1900, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sendData(new String("Sigo vivo").getBytes());
+			}
+		});
 	}
 
 	/**
@@ -52,8 +63,8 @@ public class GestorTrackers extends Observable implements Runnable {
 		try {
 			this.ip = ip;
 			this.port = port;
-			this.socket = new MulticastSocket(port);
-			this.group = InetAddress.getByName(ip);
+			this.socket = new MulticastSocket(this.port);
+			this.group = InetAddress.getByName(this.ip);
 			this.socket.joinGroup(group);
 			this.enable = true;
 			return this.socket.isConnected();
@@ -200,8 +211,9 @@ public class GestorTrackers extends Observable implements Runnable {
 
 	public void start() {
 		try {
-			readingThread = new Thread(this);
-			readingThread.start();
+			this.timerKeepAlive.start();
+			this.readingThread = new Thread(this);
+			this.readingThread.start();
 		} catch (Exception e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(),
 					new Object() {
