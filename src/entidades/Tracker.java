@@ -41,14 +41,15 @@ public class Tracker {
 	}
 
 	public void setLastKeepAlive(Date lastKeepAlive) {
-		if (this.lastKeepAlive != null) {
-			this.differenceBetweenKeepAlive = (lastKeepAlive.getTime() - this.lastKeepAlive.getTime()) / 1000;
-		}
 		this.lastKeepAlive = lastKeepAlive;
 	}
 
 	public long getDifferenceBetweenKeepAlive() {
-		return differenceBetweenKeepAlive;
+		if (this.lastKeepAlive != null) {
+			return (new Date().getTime() - this.lastKeepAlive.getTime()) / 1000;
+		} else {
+			return 0;
+		}
 	}
 
 	public void setDifferenceBetweenKeepAlive(long differenceBetweenKeepAlive) {

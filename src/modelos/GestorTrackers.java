@@ -34,7 +34,8 @@ public class GestorTrackers extends Observable implements Runnable {
 	private Vector<Tracker>			trackers;
 
 	private Thread					readingThread;
-	private Timer					timerKeepAlive;
+	private Timer					timerSendKeepAlive;
+	private Timer					timerCheckKeepAlive;
 
 	private MulticastSocket			socket;
 	private InetAddress				group;
@@ -45,13 +46,27 @@ public class GestorTrackers extends Observable implements Runnable {
 		this.enable = false;
 		this.trackers = new Vector<Tracker>();
 
-		this.timerKeepAlive = new Timer(2000, new ActionListener() {
+		this.timerSendKeepAlive = new Timer(1500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				while (isWriting)
 					;
 				isWriting = true;
-				sendData(createDatagram((byte) 0x06, ByteBuffer.allocate(4).putInt(currentTracker.getId()).array())[0]);
+				sendData(createDatagram(7, ByteBuffer.allocate(4).putInt(currentTracker.getId()).array())[0]);
 				isWriting = false;
+			}
+		});
+
+		this.timerCheckKeepAlive = new Timer(2000, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for (Tracker t : trackers) {
+					if (t.getDifferenceBetweenKeepAlive() > 2) {
+						System.out.println("Has tardado: " + t.getId());
+						removeTracker(t);
+						if (t.isMaster()) {
+							// TODO Reelegir master
+						}
+					}
+				}
 			}
 		});
 	}
@@ -69,9 +84,6 @@ public class GestorTrackers extends Observable implements Runnable {
 		try {
 			this.ip = ip;
 			this.port = port;
-
-			this.currentTracker = new Tracker(getAvailableId(), this.trackers.size() == 0);
-			addTracker(currentTracker);
 
 			this.socket = new MulticastSocket(port);
 			this.group = InetAddress.getByName(this.ip);
@@ -93,7 +105,8 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public boolean disconnect() {
 		try {
-			this.timerKeepAlive.stop();
+			this.timerSendKeepAlive.stop();
+			this.timerCheckKeepAlive.stop();
 			this.socket.leaveGroup(group);
 			this.enable = false;
 			this.removeTrackers();
@@ -113,8 +126,11 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public int getAvailableId() {
 		int id = 1;
+		System.out.println("Num trackers: " + trackers.size());
 		boolean enc = false;
 		for (id = 1; id < Integer.MAX_VALUE; id++) {
+			// System.out.println("Comprobando: " + id);
+			enc = false;
 			for (Tracker tracker : trackers) {
 				if (tracker.getId() == id) {
 					enc = true;
@@ -127,9 +143,11 @@ public class GestorTrackers extends Observable implements Runnable {
 				// } else if (currentTracker.getId() != id) {
 				// return id;
 				// }
+				System.out.println("Sale: " + id);
 				return id;
 			}
 		}
+		System.out.println("Sale: " + id);
 		return -1;
 	}
 
@@ -168,7 +186,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	}
 
 	/**
-	 * Función para notificar que se han alterado los datos de un tracker
+	 * Funcion para notificar que se han alterado los datos de un tracker
 	 * 
 	 * @param tracker
 	 */
@@ -195,7 +213,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public void processData(final byte[] data) {
 		int code = ByteBuffer.wrap(Arrays.copyOfRange(data, 0, 4)).getInt();
-		System.out.println("Codigo recibido: " + code);
+		// System.out.println("Codigo recibido: " + code);
 		switch (code) {
 			case 0: // OK
 
@@ -205,35 +223,51 @@ public class GestorTrackers extends Observable implements Runnable {
 
 				break;
 
-			case 2: // REPLICATION
+			case 2: // DB REPLICATION
 
 				break;
 
-			case 3: // READY_TO_SAVE
+			case 3: // Trackers IDs
 
 				break;
 
-			case 4: // SAVE_DATA
+			case 4: // READY_TO_SAVE
 
 				break;
 
-			case 5: // DO_NOT_SAVE_DATA
+			case 5: // SAVE_DATA
 
 				break;
 
-			case 6: // KEEP_ALIVE
-				int id = ByteBuffer.wrap(Arrays.copyOfRange(data, 16, 20)).getInt();
-				trackers.firstElement().setLastKeepAlive(new Date());
-				setTracker(trackers.firstElement());
-				System.out.println("ID Recibida: " + id);
+			case 6: // DO_NOT_SAVE_DATA
+
+				break;
+
+			case 7: // KEEP_ALIVE
+				updateTrackerKeepAlive(ByteBuffer.wrap(Arrays.copyOfRange(data, 16, 20)).getInt());
 				break;
 
 			case 99: // ERR
 
 				break;
 		}
+		// System.out.println("Datos recibidos: " + Arrays.toString(data));
+	}
 
-		System.out.println("Datos recibidos: " + Arrays.toString(data));
+	public void updateTrackerKeepAlive(final int id) {
+		System.out.println("ID Recibida: " + id);
+		boolean enc = false;
+		for (Tracker t : trackers) {
+			if (t.getId() == id) {
+				t.setLastKeepAlive(new Date());
+				setTracker(t);
+				enc = true;
+			}
+		}
+		if (!enc) {
+			System.out.println("Nuevo tracker encontrado");
+			trackers.addElement(new Tracker(id, false));
+		}
 	}
 
 	/**
@@ -255,7 +289,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			partitions = length / 48;
 		}
 
-		System.out.println("Data: " + Arrays.toString(data));
+		// System.out.println("Data: " + Arrays.toString(data));
 
 		byte[][] datagrams = new byte[partitions][64];
 		for (int i = 0; i < partitions; i++) {
@@ -301,13 +335,13 @@ public class GestorTrackers extends Observable implements Runnable {
 					datagrams[i][16 + j] = data[j];
 				}
 			}
-
 		}
 
-		System.out.println("Datagrama creado");
-		for (int i = 0; i < partitions; i++) {
-			System.out.println("Datagrama " + (i + 1) + ": " + Arrays.toString(datagrams[i]));
-		}
+		// System.out.println("Datagrama creado");
+		// for (int i = 0; i < partitions; i++) {
+		// System.out.println("Datagrama " + (i + 1) + ": " +
+		// Arrays.toString(datagrams[i]));
+		// }
 
 		return datagrams;
 	}
@@ -331,9 +365,25 @@ public class GestorTrackers extends Observable implements Runnable {
 
 	public void start() {
 		try {
-			this.timerKeepAlive.start();
+			this.timerCheckKeepAlive.start();
 			this.readingThread = new Thread(this);
 			this.readingThread.start();
+
+			int wait = 1;
+			while (wait <= 10) {
+				try {
+					System.out.println("Esperando " + wait);
+					Thread.sleep(1000);
+					wait++;
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
+			this.currentTracker = new Tracker(getAvailableId(), this.trackers.size() == 0);
+			addTracker(currentTracker);
+			this.timerSendKeepAlive.start();
+
 		} catch (Exception e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
@@ -380,7 +430,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	}
 
 	public static void main(String[] strings) {
-		boolean connect = GestorTrackers.getInstance().connect("228.5.6.7", 5000);
+		GestorTrackers.getInstance().connect("228.5.6.7", 5000);
 		GestorTrackers.getInstance().start();
 		// if (!connect) {
 		// System.out.println("No conectado");

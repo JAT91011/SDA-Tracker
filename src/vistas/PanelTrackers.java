@@ -7,14 +7,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Vector;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import entidades.Tracker;
 import modelos.GestorTrackers;
 
 public class PanelTrackers extends JPanel implements Observer {
@@ -73,16 +71,17 @@ public class PanelTrackers extends JPanel implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		if (o == GestorTrackers.getInstance()) {
-			Vector<Tracker> trackers = GestorTrackers.getInstance().getTrackers();
-			String[][] contenido = new String[trackers.size()][header.length];
-			for (int i = 0; i < trackers.size(); i++) {
-				contenido[i][0] = Integer.toString(trackers.get(i).getId());
-				if (trackers.get(i).isMaster()) {
+			String[][] contenido = new String[GestorTrackers.getInstance().getTrackers().size()][header.length];
+			for (int i = 0; i < GestorTrackers.getInstance().getTrackers().size(); i++) {
+				contenido[i][0] = Integer.toString(GestorTrackers.getInstance().getTrackers().get(i).getId());
+				if (GestorTrackers.getInstance().getTrackers().get(i).isMaster()) {
 					contenido[i][1] = "Maestro";
 				} else {
 					contenido[i][1] = "Esclavo";
 				}
-				contenido[i][2] = Long.toString(trackers.get(i).getDifferenceBetweenKeepAlive()) + " segundos";
+				contenido[i][2] = Long
+						.toString(GestorTrackers.getInstance().getTrackers().get(i).getDifferenceBetweenKeepAlive())
+						+ " segundos";
 			}
 			modelTable.setDataVector(contenido, header);
 			tablaTrackers.setModel(modelTable);

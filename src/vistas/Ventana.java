@@ -15,7 +15,7 @@ public class Ventana extends JFrame {
 
 	private Ventana() {
 		super();
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setIconImage(null);
 		setSize(600, 400);
 		setIconImage((new ImageIcon("icons/app-icon.png")).getImage());
