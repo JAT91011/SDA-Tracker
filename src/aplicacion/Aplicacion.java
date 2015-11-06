@@ -1,7 +1,6 @@
 package aplicacion;
 
 import java.awt.EventQueue;
-import java.util.Date;
 
 import javax.swing.UIManager;
 
@@ -13,14 +12,6 @@ import vistas.Ventana;
 public class Aplicacion {
 
 	public static void main(final String[] args) {
-		System.out.println("Tiempo1: " + new Date().getTime());
-		try {
-			Thread.sleep(10);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Tiempo2: " + new Date().getTime());
-		System.out.println("MAX: " + Integer.toString(Integer.MAX_VALUE));
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {

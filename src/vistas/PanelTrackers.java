@@ -5,15 +5,19 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import entidades.Tracker;
 import modelos.GestorTrackers;
+import utilidades.LogErrores;
 
 public class PanelTrackers extends JPanel implements Observer {
 
@@ -69,22 +73,29 @@ public class PanelTrackers extends JPanel implements Observer {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
+	public synchronized void update(Observable o, Object arg) {
 		if (o == GestorTrackers.getInstance()) {
-			String[][] contenido = new String[GestorTrackers.getInstance().getTrackers().size()][header.length];
-			for (int i = 0; i < GestorTrackers.getInstance().getTrackers().size(); i++) {
-				contenido[i][0] = Integer.toString(GestorTrackers.getInstance().getTrackers().get(i).getId());
-				if (GestorTrackers.getInstance().getTrackers().get(i).isMaster()) {
-					contenido[i][1] = "Maestro";
-				} else {
-					contenido[i][1] = "Esclavo";
+			try {
+				String[][] contenido = new String[GestorTrackers.getInstance().getTrackers().size()][header.length];
+
+				ConcurrentHashMap<Integer, Tracker> trackers = GestorTrackers.getInstance().getTrackers();
+				int i = 0;
+				for (Map.Entry<Integer, Tracker> entry : trackers.entrySet()) {
+					if (entry.getValue().getDifferenceBetweenKeepAlive() > 2) {
+						contenido[i][0] = Integer.toString(entry.getValue().getId());
+						contenido[i][1] = entry.getValue().isMaster() ? "Maestro" : "Esclavo";
+						contenido[i][2] = Long.toString(entry.getValue().getDifferenceBetweenKeepAlive()) + " segundos";
+						i++;
+					}
 				}
-				contenido[i][2] = Long
-						.toString(GestorTrackers.getInstance().getTrackers().get(i).getDifferenceBetweenKeepAlive())
-						+ " segundos";
+
+				modelTable.setDataVector(contenido, header);
+				tablaTrackers.setModel(modelTable);
+			} catch (Exception e) {
+				LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+				}.getClass().getEnclosingMethod().getName(), e.toString());
+				e.printStackTrace();
 			}
-			modelTable.setDataVector(contenido, header);
-			tablaTrackers.setModel(modelTable);
 		}
 	}
 }
