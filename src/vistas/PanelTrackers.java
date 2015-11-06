@@ -76,12 +76,11 @@ public class PanelTrackers extends JPanel implements Observer {
 	public synchronized void update(Observable o, Object arg) {
 		if (o == GestorTrackers.getInstance()) {
 			try {
-				String[][] contenido = new String[GestorTrackers.getInstance().getTrackers().size()][header.length];
-
 				ConcurrentHashMap<Integer, Tracker> trackers = GestorTrackers.getInstance().getTrackers();
+				String[][] contenido = new String[trackers.size()][header.length];
 				int i = 0;
 				for (Map.Entry<Integer, Tracker> entry : trackers.entrySet()) {
-					if (entry.getValue().getDifferenceBetweenKeepAlive() > 2) {
+					if (entry.getValue() != null && entry.getValue().getDifferenceBetweenKeepAlive() < 2) {
 						contenido[i][0] = Integer.toString(entry.getValue().getId());
 						contenido[i][1] = entry.getValue().isMaster() ? "Maestro" : "Esclavo";
 						contenido[i][2] = Long.toString(entry.getValue().getDifferenceBetweenKeepAlive()) + " segundos";
@@ -91,6 +90,7 @@ public class PanelTrackers extends JPanel implements Observer {
 
 				modelTable.setDataVector(contenido, header);
 				tablaTrackers.setModel(modelTable);
+				tablaTrackers.updateUI();
 			} catch (Exception e) {
 				LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.toString());

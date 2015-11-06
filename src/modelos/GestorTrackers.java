@@ -50,7 +50,6 @@ public class GestorTrackers extends Observable implements Runnable {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					sendData(createDatagram(7, ByteBuffer.allocate(4).putInt(currentTracker.getId()).array())[0]);
-
 				} catch (Exception ex) {
 					LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
 					}.getClass().getEnclosingMethod().getName(), ex.toString());
@@ -61,7 +60,6 @@ public class GestorTrackers extends Observable implements Runnable {
 
 		this.timerCheckKeepAlive = new Timer(2000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
 				try {
 					for (Map.Entry<Integer, Tracker> entry : trackers.entrySet()) {
 						if (entry.getValue().getDifferenceBetweenKeepAlive() > 2) {
@@ -135,7 +133,6 @@ public class GestorTrackers extends Observable implements Runnable {
 	 * @return La primera ID disponible
 	 */
 	public synchronized int getAvailableId() {
-
 		try {
 			System.out.println("Num trackers: " + trackers.size());
 			for (int id = 1; id < Integer.MAX_VALUE; id++) {
@@ -156,7 +153,6 @@ public class GestorTrackers extends Observable implements Runnable {
 	 * Funcion para notificar que se ha insertado un nuevo tracker
 	 */
 	public synchronized void addTracker(Tracker tracker) {
-
 		try {
 			this.trackers.put(tracker.getId(), tracker);
 			setChanged();
@@ -239,50 +235,55 @@ public class GestorTrackers extends Observable implements Runnable {
 	 *            Datos recibidos
 	 */
 	public void processData(final byte[] data) {
-		int code = ByteBuffer.wrap(Arrays.copyOfRange(data, 0, 4)).getInt();
-		// System.out.println("Codigo recibido: " + code);
-		switch (code) {
-			case 0: // OK
+		try {
+			int code = ByteBuffer.wrap(Arrays.copyOfRange(data, 0, 4)).getInt();
+			// System.out.println("Codigo recibido: " + code);
+			switch (code) {
+				case 0: // OK
 
-				break;
+					break;
 
-			case 1: // GET_DATA
+				case 1: // GET_DATA
 
-				break;
+					break;
 
-			case 2: // DB REPLICATION
+				case 2: // DB REPLICATION
 
-				break;
+					break;
 
-			case 3: // Trackers IDs
+				case 3: // Trackers IDs
 
-				break;
+					break;
 
-			case 4: // READY_TO_SAVE
+				case 4: // READY_TO_SAVE
 
-				break;
+					break;
 
-			case 5: // SAVE_DATA
+				case 5: // SAVE_DATA
 
-				break;
+					break;
 
-			case 6: // DO_NOT_SAVE_DATA
+				case 6: // DO_NOT_SAVE_DATA
 
-				break;
+					break;
 
-			case 7: // KEEP_ALIVE
-				updateTrackerKeepAlive(ByteBuffer.wrap(Arrays.copyOfRange(data, 16, 20)).getInt());
-				break;
+				case 7: // KEEP_ALIVE
+					updateTrackerKeepAlive(ByteBuffer.wrap(Arrays.copyOfRange(data, 16, 20)).getInt());
+					break;
 
-			case 99: // ERR
+				case 99: // ERR
 
-				break;
+					break;
+			}
+		} catch (Exception ex) {
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), ex.toString());
+			ex.printStackTrace();
 		}
 		// System.out.println("Datos recibidos: " + Arrays.toString(data));
 	}
 
 	public synchronized void updateTrackerKeepAlive(final int id) {
-
 		try {
 			System.out.println("ID Recibida: " + id);
 			if (trackers.get(id) == null) {
@@ -310,60 +311,67 @@ public class GestorTrackers extends Observable implements Runnable {
 	 *         dado que la trama puede estar particionada
 	 */
 	public byte[][] createDatagram(int code, byte[] data) {
-		int length = data.length;
-		int partitions = 0;
-		if (length < 48) {
-			partitions = 1;
-		} else {
-			partitions = length / 48;
-		}
-
-		// System.out.println("Data: " + Arrays.toString(data));
-
-		byte[][] datagrams = new byte[partitions][64];
-		for (int i = 0; i < partitions; i++) {
-
-			// CODE
-			byte[] codeArray = ByteBuffer.allocate(4).putInt(code).array();
-			datagrams[i][0] = codeArray[0];
-			datagrams[i][1] = codeArray[1];
-			datagrams[i][2] = codeArray[2];
-			datagrams[i][3] = codeArray[3];
-
-			// PARTITIONS
-			byte[] codePartitions = ByteBuffer.allocate(4).putInt(partitions).array();
-			datagrams[i][4] = codePartitions[0];
-			datagrams[i][5] = codePartitions[1];
-			datagrams[i][6] = codePartitions[2];
-			datagrams[i][7] = codePartitions[3];
-
-			// CURRENT PARTITION
-			byte[] codeCurrentPartition = ByteBuffer.allocate(4).putInt(i + 1).array();
-			datagrams[i][8] = codeCurrentPartition[0];
-			datagrams[i][9] = codeCurrentPartition[1];
-			datagrams[i][10] = codeCurrentPartition[2];
-			datagrams[i][11] = codeCurrentPartition[3];
-
-			// LENGTH
-			if (i + 1 == partitions) {
-				byte[] lengthArray = ByteBuffer.allocate(4).putInt(length).array();
-				datagrams[i][12] = lengthArray[0];
-				datagrams[i][13] = lengthArray[1];
-				datagrams[i][14] = lengthArray[2];
-				datagrams[i][15] = lengthArray[3];
-				for (int j = 0; j < length; j++) {
-					datagrams[i][16 + j] = data[j];
-				}
+		byte[][] datagrams = null;
+		try {
+			int length = data.length;
+			int partitions = 0;
+			if (length < 48) {
+				partitions = 1;
 			} else {
-				byte[] lengthArray = ByteBuffer.allocate(4).putInt(48).array();
-				datagrams[i][12] = lengthArray[0];
-				datagrams[i][13] = lengthArray[1];
-				datagrams[i][14] = lengthArray[2];
-				datagrams[i][15] = lengthArray[3];
-				for (int j = 0; j < 48; j++) {
-					datagrams[i][16 + j] = data[j];
+				partitions = length / 48;
+			}
+
+			// System.out.println("Data: " + Arrays.toString(data));
+
+			datagrams = new byte[partitions][64];
+			for (int i = 0; i < partitions; i++) {
+
+				// CODE
+				byte[] codeArray = ByteBuffer.allocate(4).putInt(code).array();
+				datagrams[i][0] = codeArray[0];
+				datagrams[i][1] = codeArray[1];
+				datagrams[i][2] = codeArray[2];
+				datagrams[i][3] = codeArray[3];
+
+				// PARTITIONS
+				byte[] codePartitions = ByteBuffer.allocate(4).putInt(partitions).array();
+				datagrams[i][4] = codePartitions[0];
+				datagrams[i][5] = codePartitions[1];
+				datagrams[i][6] = codePartitions[2];
+				datagrams[i][7] = codePartitions[3];
+
+				// CURRENT PARTITION
+				byte[] codeCurrentPartition = ByteBuffer.allocate(4).putInt(i + 1).array();
+				datagrams[i][8] = codeCurrentPartition[0];
+				datagrams[i][9] = codeCurrentPartition[1];
+				datagrams[i][10] = codeCurrentPartition[2];
+				datagrams[i][11] = codeCurrentPartition[3];
+
+				// LENGTH
+				if (i + 1 == partitions) {
+					byte[] lengthArray = ByteBuffer.allocate(4).putInt(length).array();
+					datagrams[i][12] = lengthArray[0];
+					datagrams[i][13] = lengthArray[1];
+					datagrams[i][14] = lengthArray[2];
+					datagrams[i][15] = lengthArray[3];
+					for (int j = 0; j < length; j++) {
+						datagrams[i][16 + j] = data[j];
+					}
+				} else {
+					byte[] lengthArray = ByteBuffer.allocate(4).putInt(48).array();
+					datagrams[i][12] = lengthArray[0];
+					datagrams[i][13] = lengthArray[1];
+					datagrams[i][14] = lengthArray[2];
+					datagrams[i][15] = lengthArray[3];
+					for (int j = 0; j < 48; j++) {
+						datagrams[i][16 + j] = data[j];
+					}
 				}
 			}
+		} catch (Exception e) {
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
+			e.printStackTrace();
 		}
 
 		// System.out.println("Datagrama creado");
@@ -399,7 +407,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.readingThread.start();
 
 			int wait = 1;
-			while (wait <= 10) {
+			while (wait <= 5) {
 				try {
 					System.out.println("Esperando " + wait);
 					Thread.sleep(1000);
