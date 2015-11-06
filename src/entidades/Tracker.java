@@ -7,7 +7,6 @@ public class Tracker {
 	private int		id;
 	private boolean	master;
 	private Date	lastKeepAlive;
-	private long	differenceBetweenKeepAlive;
 
 	public Tracker() {
 
@@ -17,7 +16,6 @@ public class Tracker {
 		this.id = id;
 		this.master = master;
 		this.lastKeepAlive = null;
-		this.differenceBetweenKeepAlive = 0;
 	}
 
 	public int getId() {
@@ -50,9 +48,5 @@ public class Tracker {
 		} else {
 			return 0;
 		}
-	}
-
-	public void setDifferenceBetweenKeepAlive(long differenceBetweenKeepAlive) {
-		this.differenceBetweenKeepAlive = differenceBetweenKeepAlive;
 	}
 }
