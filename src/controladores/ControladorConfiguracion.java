@@ -9,7 +9,7 @@ public class ControladorConfiguracion {
 	}
 
 	public void conectar(final String ip, final int port) {
-		boolean connected = GestorTrackers.getInstance().connect(ip, port);
+		GestorTrackers.getInstance().connect(ip, port);
 		GestorTrackers.getInstance().start();
 	}
 

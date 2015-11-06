@@ -20,7 +20,7 @@ import utilidades.LogErrores;
 import vistas.Ventana;
 
 /**
- * Implementa la funcionalidad específica del protocolo UDP de un tracker
+ * Implementa la funcionalidad especifica del protocolo UDP de un tracker
  * bitTorrent.
  */
 
@@ -98,7 +98,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.group = InetAddress.getByName(this.ip);
 			this.socket.joinGroup(group);
 			this.enable = true;
-			return this.socket.isConnected();
+			return true;
 		} catch (IOException e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
@@ -119,7 +119,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.socket.leaveGroup(group);
 			this.enable = false;
 			this.removeTrackers();
-			return this.socket.isClosed();
+			return true;
 		} catch (IOException e) {
 			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
@@ -209,7 +209,6 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public synchronized void setTracker(Tracker tracker) {
 		try {
-			// CUIDADO
 			this.trackers.put(tracker.getId(), tracker);
 			setChanged();
 			notifyObservers();
@@ -289,7 +288,9 @@ public class GestorTrackers extends Observable implements Runnable {
 			System.out.println("ID Recibida: " + id);
 			if (trackers.get(id) == null) {
 				System.out.println("Nuevo tracker encontrado");
-				addTracker(new Tracker(id, false));
+				Tracker t = new Tracker(id, false);
+				t.setLastKeepAlive(new Date());
+				addTracker(t);
 			} else {
 				trackers.get(id).setLastKeepAlive(new Date());
 				setTracker(trackers.get(id));
@@ -419,7 +420,11 @@ public class GestorTrackers extends Observable implements Runnable {
 				trackers.get(min).setMaster(true);
 			}
 			this.currentTracker = new Tracker(getAvailableId(), this.trackers.size() == 0);
-			Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "]");
+			if (this.currentTracker.isMaster()) {
+				Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
+			} else {
+				Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: SLAVE]");
+			}
 			addTracker(currentTracker);
 			this.timerSendKeepAlive.start();
 
@@ -456,6 +461,11 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public synchronized void updateMaster() {
 		try {
+			int id = getLowerId();
+			if (id == currentTracker.getId()) {
+				currentTracker.setMaster(true);
+				Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
+			}
 			trackers.get(getLowerId()).setMaster(true);
 			setTracker(trackers.get(getLowerId()));
 		} catch (Exception ex) {
