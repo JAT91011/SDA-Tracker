@@ -77,20 +77,22 @@ public class PanelTrackers extends JPanel implements Observer {
 		if (o == GestorTrackers.getInstance()) {
 			try {
 				ConcurrentHashMap<Integer, Tracker> trackers = GestorTrackers.getInstance().getTrackers();
-				String[][] contenido = new String[trackers.size()][header.length];
+
+				if (trackers.size() != tablaTrackers.getRowCount()) {
+					modelTable.setDataVector(new String[trackers.size()][header.length], header);
+				}
+
 				int i = 0;
 				for (Map.Entry<Integer, Tracker> entry : trackers.entrySet()) {
 					if (entry.getValue() != null && entry.getValue().getDifferenceBetweenKeepAlive() < 2) {
-						contenido[i][0] = Integer.toString(entry.getValue().getId());
-						contenido[i][1] = entry.getValue().isMaster() ? "Maestro" : "Esclavo";
-						contenido[i][2] = Long.toString(entry.getValue().getDifferenceBetweenKeepAlive()) + " segundos";
+						tablaTrackers.getModel().setValueAt(Integer.toString(entry.getValue().getId()), i, 0);
+						tablaTrackers.getModel().setValueAt(entry.getValue().isMaster() ? "Maestro" : "Esclavo", i, 1);
+						tablaTrackers.getModel().setValueAt(
+								Long.toString(entry.getValue().getDifferenceBetweenKeepAlive()) + " segundos", i, 2);
 						i++;
 					}
 				}
 
-				modelTable.setDataVector(contenido, header);
-				tablaTrackers.setModel(modelTable);
-				tablaTrackers.updateUI();
 			} catch (Exception e) {
 				LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.toString());

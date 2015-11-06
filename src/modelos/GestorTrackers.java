@@ -46,7 +46,7 @@ public class GestorTrackers extends Observable implements Runnable {
 		this.enable = false;
 		this.trackers = new ConcurrentHashMap<Integer, Tracker>();
 
-		this.timerSendKeepAlive = new Timer(1500, new ActionListener() {
+		this.timerSendKeepAlive = new Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					sendData(createDatagram(7, ByteBuffer.allocate(4).putInt(currentTracker.getId()).array())[0]);
