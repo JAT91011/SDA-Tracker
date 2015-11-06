@@ -12,4 +12,12 @@ public class Utils {
 
 		return result;
 	}
+
+	public static long byteArrayToLong(byte[] byteArray) {
+		long value = 0;
+		for (int i = 0; i < byteArray.length; i++) {
+			value = (value << 8) + (byteArray[i] & 0xff);
+		}
+		return value;
+	}
 }

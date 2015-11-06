@@ -11,11 +11,6 @@ public class ControladorConfiguracion {
 	public void conectar(final String ip, final int port) {
 		boolean connected = GestorTrackers.getInstance().connect(ip, port);
 		GestorTrackers.getInstance().start();
-		if (connected) {
-			GestorTrackers.getInstance().start();
-		} else {
-			// TODO Mostrar aviso
-		}
 	}
 
 	public void desconectar() {

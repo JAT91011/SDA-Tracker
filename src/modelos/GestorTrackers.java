@@ -17,6 +17,7 @@ import javax.swing.Timer;
 
 import entidades.Tracker;
 import utilidades.LogErrores;
+import vistas.Ventana;
 
 /**
  * Implementa la funcionalidad específica del protocolo UDP de un tracker
@@ -66,7 +67,7 @@ public class GestorTrackers extends Observable implements Runnable {
 							System.out.println("Has tardado: " + entry.getValue().getId());
 							removeTracker(entry.getValue().getId());
 							if (entry.getValue().isMaster()) {
-								// TODO Reelegir master
+								updateMaster();
 							}
 						}
 					}
@@ -407,17 +408,18 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.readingThread.start();
 
 			int wait = 1;
-			while (wait <= 5) {
-				try {
-					System.out.println("Esperando " + wait);
-					Thread.sleep(1000);
-					wait++;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			while (wait <= 3) {
+				System.out.println("Esperando " + wait);
+				Thread.sleep(1000);
+				wait++;
 			}
 
+			int min = getLowerId();
+			if (min != 0) {
+				trackers.get(min).setMaster(true);
+			}
 			this.currentTracker = new Tracker(getAvailableId(), this.trackers.size() == 0);
+			Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "]");
 			addTracker(currentTracker);
 			this.timerSendKeepAlive.start();
 
@@ -425,6 +427,41 @@ public class GestorTrackers extends Observable implements Runnable {
 			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
+		}
+	}
+
+	public synchronized int getLowerId() {
+		try {
+			int id = 0;
+			if (!trackers.isEmpty()) {
+				id = Integer.MAX_VALUE;
+			}
+			for (Map.Entry<Integer, Tracker> entry : trackers.entrySet()) {
+				if (entry.getKey() < id) {
+					id = entry.getKey();
+				}
+			}
+			return id;
+		} catch (Exception e) {
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
+			e.printStackTrace();
+			return 0;
+		}
+	}
+
+	/**
+	 * Funcion para actualizar y nombrar el nuevo Master
+	 * 
+	 */
+	public synchronized void updateMaster() {
+		try {
+			trackers.get(getLowerId()).setMaster(true);
+			setTracker(trackers.get(getLowerId()));
+		} catch (Exception ex) {
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), ex.toString());
+			ex.printStackTrace();
 		}
 	}
 
