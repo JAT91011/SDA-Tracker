@@ -100,6 +100,7 @@ public class PanelPestanas extends JPanel implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 		if (e.getSource() == lblDisconnect) {
 			this.controladorConfiguracion.disconnect();
+			Ventana.getInstance().setTitle("Tracker");
 			Ventana.getInstance().getSlider().slideRight();
 		} else if (e.getSource() == lblTrackers) {
 			if (!this.watchingTrackers) {
