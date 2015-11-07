@@ -24,7 +24,7 @@ public class PanelPeers extends JPanel implements Observer {
 	private DefaultTableModel		modelTableContent;
 
 	public PanelPeers() {
-		setOpaque(false);
+		setBackground(new Color(255, 218, 185));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 450, 0 };
 		gridBagLayout.rowHeights = new int[] { 300, 0 };
@@ -35,17 +35,15 @@ public class PanelPeers extends JPanel implements Observer {
 		final String[] headerPeers = { "ID", "IP", "Puerto" };
 
 		modelTablePeers = new DefaultTableModel();
-		modelTablePeers.setDataVector(new String[1][headerPeers.length],
-				headerPeers);
+		modelTablePeers.setDataVector(new String[1][headerPeers.length], headerPeers);
 
-		final String[] headerContent = { "ID", "INFO_HASH", "Estado",
-				"Completado" };
+		final String[] headerContent = { "ID", "INFO_HASH", "Estado", "Completado" };
 
 		modelTableContent = new DefaultTableModel();
-		modelTableContent.setDataVector(new String[1][headerContent.length],
-				headerContent);
+		modelTableContent.setDataVector(new String[1][headerContent.length], headerContent);
 
 		JSplitPane splitPane = new JSplitPane();
+		splitPane.setBackground(new Color(255, 218, 185));
 		splitPane.setDividerSize(5);
 		splitPane.setResizeWeight(.7d);
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -91,8 +89,7 @@ public class PanelPeers extends JPanel implements Observer {
 		tableContent.setBackground(Color.WHITE);
 		tableContent.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 14));
 		tableContent.setRowHeight(30);
-		tableContent.getTableHeader()
-				.setFont(new Font("Arial", Font.PLAIN, 15));
+		tableContent.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 15));
 		scrollPaneContent.setViewportView(tableContent);
 	}
 

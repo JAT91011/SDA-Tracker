@@ -7,6 +7,7 @@ public class Tracker {
 	private int		id;
 	private boolean	master;
 	private Date	lastKeepAlive;
+	private Date	firstConnection;
 
 	public Tracker() {
 
@@ -48,5 +49,13 @@ public class Tracker {
 		} else {
 			return 0;
 		}
+	}
+
+	public Date getFirstConnection() {
+		return firstConnection;
+	}
+
+	public void setFirstConnection(Date firstConnection) {
+		this.firstConnection = firstConnection;
 	}
 }

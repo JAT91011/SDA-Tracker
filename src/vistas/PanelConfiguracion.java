@@ -26,38 +26,37 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 
 import controladores.ControladorConfiguracion;
-import utilidades.Propiedades;
+import utilidades.Properties;
 import vistas.componentes.IFileChooser;
 import vistas.componentes.ITextField;
 import vistas.componentes.IToogleButton;
 
 public class PanelConfiguracion extends JPanel {
 
-	private static final long			serialVersionUID	= 4959247560481979942L;
-	private ITextField					txtIP;
-	private ITextField					txtPuertoTrackers;
-	private ITextField					txtPuertoPeers;
-	private IToogleButton				btnConectar;
-	private JLabel						lblApariencia;
-	private JComboBox<String>			cboApariencia;
+	private static final long	serialVersionUID	= 4959247560481979942L;
+	private ITextField			txtIP;
+	private ITextField			txtPuertoTrackers;
+	private ITextField			txtPuertoPeers;
+	private IToogleButton		btnConectar;
+	private JLabel				lblApariencia;
+	private JComboBox<String>	cboApariencia;
 
-	private HashMap<String, String>		lookNFeelHashMap;
-	private String						currentLookAndFeel;
+	private HashMap<String, String>	lookNFeelHashMap;
+	private String					currentLookAndFeel;
 
-	private static String				IPADDRESS_PATTERN	= "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+	private static String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
-	private JLabel						lblPuertoPeers;
-	private JPanel						panAjustes;
-	private JButton						btnResetear;
-	private JLabel						lblEstado;
-	private JLabel						lblEstadoActual;
-	private JLabel						lblRutaBaseDatos;
-	private IFileChooser				panFileChooser;
+	private JLabel			lblPuertoPeers;
+	private JPanel			panAjustes;
+	private JButton			btnResetear;
+	private JLabel			lblEstado;
+	private JLabel			lblEstadoActual;
+	private JLabel			lblRutaBaseDatos;
+	private IFileChooser	panFileChooser;
 
-	private ControladorConfiguracion	controladorConfiguracion;
+	private ControladorConfiguracion controladorConfiguracion;
 
 	public PanelConfiguracion() {
 		setOpaque(false);
@@ -67,16 +66,13 @@ public class PanelConfiguracion extends JPanel {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 500, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 102, 55, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 1.0, 0.0, 1.0,
-				Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 1.0, 0.0, 0.0, 1.0,
-				Double.MIN_VALUE };
+		gridBagLayout.columnWeights = new double[] { 1.0, 0.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
 		panAjustes = new JPanel();
 		panAjustes.setBackground(Color.LIGHT_GRAY);
-		panAjustes.setBorder(
-				new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		panAjustes.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		GridBagConstraints gbc_panAjustes = new GridBagConstraints();
 		gbc_panAjustes.insets = new Insets(0, 0, 5, 5);
 		gbc_panAjustes.fill = GridBagConstraints.BOTH;
@@ -86,10 +82,8 @@ public class PanelConfiguracion extends JPanel {
 		GridBagLayout gbl_panAjustes = new GridBagLayout();
 		gbl_panAjustes.columnWidths = new int[] { 0, 0, 0 };
 		gbl_panAjustes.rowHeights = new int[] { 0, 45, 45, 45, 45, 55, 0 };
-		gbl_panAjustes.columnWeights = new double[] { 0.0, 1.0,
-				Double.MIN_VALUE };
-		gbl_panAjustes.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-				Double.MIN_VALUE };
+		gbl_panAjustes.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panAjustes.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		panAjustes.setLayout(gbl_panAjustes);
 
 		lblEstado = new JLabel("Estado:");
@@ -125,8 +119,8 @@ public class PanelConfiguracion extends JPanel {
 		txtIP = new ITextField("127.0.0.1");
 		txtIP.setErrorIcon(new ImageIcon("icons/error-icon.png"));
 		txtIP.setFont(new Font("Dialog", Font.PLAIN, 14));
-		if (!Propiedades.getIP().isEmpty()) {
-			txtIP.setText(Propiedades.getIP());
+		if (!Properties.getIp().isEmpty()) {
+			txtIP.setText(Properties.getIp());
 			txtIP.showAsHint(false);
 		}
 		GridBagConstraints gbc_txtIP = new GridBagConstraints();
@@ -148,9 +142,8 @@ public class PanelConfiguracion extends JPanel {
 
 		txtPuertoTrackers = new ITextField("1 - 65535");
 		txtPuertoTrackers.setErrorIcon(new ImageIcon("icons/error-icon.png"));
-		if (Propiedades.getPuertoTracker() != 0) {
-			txtPuertoTrackers
-					.setText(Integer.toString(Propiedades.getPuertoTracker()));
+		if (Properties.getPuertoTracker() != 0) {
+			txtPuertoTrackers.setText(Integer.toString(Properties.getPuertoTracker()));
 			txtPuertoTrackers.showAsHint(false);
 		}
 		txtPuertoTrackers.setForeground(Color.BLACK);
@@ -158,8 +151,7 @@ public class PanelConfiguracion extends JPanel {
 		txtPuertoTrackers.addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent e) {
 				char c = e.getKeyChar();
-				if (!(Character.isDigit(c) || (c == KeyEvent.VK_BACK_SPACE)
-						|| (c == KeyEvent.VK_DELETE))) {
+				if (!(Character.isDigit(c) || (c == KeyEvent.VK_BACK_SPACE) || (c == KeyEvent.VK_DELETE))) {
 					e.consume();
 				}
 			}
@@ -183,9 +175,8 @@ public class PanelConfiguracion extends JPanel {
 
 		txtPuertoPeers = new ITextField("1 - 65535");
 		txtPuertoPeers.setErrorIcon(new ImageIcon("icons/error-icon.png"));
-		if (Propiedades.getPuertoPeer() != 0) {
-			txtPuertoPeers
-					.setText(Integer.toString(Propiedades.getPuertoPeer()));
+		if (Properties.getPuertoPeer() != 0) {
+			txtPuertoPeers.setText(Integer.toString(Properties.getPuertoPeer()));
 			txtPuertoPeers.showAsHint(false);
 		}
 		txtPuertoPeers.setForeground(Color.BLACK);
@@ -193,8 +184,7 @@ public class PanelConfiguracion extends JPanel {
 		txtPuertoPeers.addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent e) {
 				char c = e.getKeyChar();
-				if (!(Character.isDigit(c) || (c == KeyEvent.VK_BACK_SPACE)
-						|| (c == KeyEvent.VK_DELETE))) {
+				if (!(Character.isDigit(c) || (c == KeyEvent.VK_BACK_SPACE) || (c == KeyEvent.VK_DELETE))) {
 					e.consume();
 				}
 			}
@@ -217,11 +207,10 @@ public class PanelConfiguracion extends JPanel {
 		panAjustes.add(lblRutaBaseDatos, gbc_lblRutaBaseDatos);
 
 		panFileChooser = new IFileChooser();
-		if (!Propiedades.getRutaBaseDatos().isEmpty()
-				&& new File(Propiedades.getRutaBaseDatos()).exists()) {
-			panFileChooser.setFile(new File(Propiedades.getRutaBaseDatos()));
-		} else if (!Propiedades.getRutaBaseDatos().isEmpty()) {
-			panFileChooser.setFile(new File(Propiedades.getRutaBaseDatos()));
+		if (!Properties.getRutaBaseDatos().isEmpty() && new File(Properties.getRutaBaseDatos()).exists()) {
+			panFileChooser.setFile(new File(Properties.getRutaBaseDatos()));
+		} else if (!Properties.getRutaBaseDatos().isEmpty()) {
+			panFileChooser.setFile(new File(Properties.getRutaBaseDatos()));
 			panFileChooser.setErrorVisible(true);
 		}
 		panFileChooser.setButtonIcon(new ImageIcon("icons/file-icon.png"));
@@ -264,8 +253,7 @@ public class PanelConfiguracion extends JPanel {
 		GridBagLayout gbl_panBotonera = new GridBagLayout();
 		gbl_panBotonera.columnWidths = new int[] { 0, 0, 0, 0 };
 		gbl_panBotonera.rowHeights = new int[] { 0, 0 };
-		gbl_panBotonera.columnWeights = new double[] { 1.0, 0.0, 1.0,
-				Double.MIN_VALUE };
+		gbl_panBotonera.columnWeights = new double[] { 1.0, 0.0, 1.0, Double.MIN_VALUE };
 		gbl_panBotonera.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		panBotonera.setLayout(gbl_panBotonera);
 
@@ -307,11 +295,10 @@ public class PanelConfiguracion extends JPanel {
 
 		btnConectar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (!controladorConfiguracion.estaConectado()) {
+				if (!controladorConfiguracion.isConnected()) {
 					if (PanelConfiguracion.this.guardar().equals("")) {
-						controladorConfiguracion.conectar(
-								txtIP.getText().trim(), Integer.parseInt(
-										txtPuertoTrackers.getText().trim()));
+						controladorConfiguracion.connect(txtIP.getText().trim(),
+								Integer.parseInt(txtPuertoTrackers.getText().trim()));
 
 						lblEstadoActual.setText("Conectado");
 						lblEstadoActual.setForeground(new Color(0, 153, 0));
@@ -319,7 +306,7 @@ public class PanelConfiguracion extends JPanel {
 						deshabilitarEntrada();
 					}
 				} else {
-					controladorConfiguracion.desconectar();
+					controladorConfiguracion.disconnect();
 					lblEstadoActual.setText("Desconectado");
 					lblEstadoActual.setForeground(new Color(220, 20, 60));
 					btnConectar.performChange();
@@ -338,9 +325,6 @@ public class PanelConfiguracion extends JPanel {
 		for (final LookAndFeelInfo lf2 : lfs) {
 			lookNFeelHashMap.put(lf2.getName(), lf2.getClassName());
 			v.add(lf2.getName());
-			if (Propiedades.getLookAndFeel().equals(lf2.getClassName())) {
-				currentLookAndFeel = lf2.getName();
-			}
 		}
 		return v;
 	}
@@ -371,8 +355,7 @@ public class PanelConfiguracion extends JPanel {
 		String rutaBaseDatos = "";
 
 		if (!txtPuertoTrackers.getText().trim().isEmpty()) {
-			puertoTracker = Integer
-					.parseInt(txtPuertoTrackers.getText().trim());
+			puertoTracker = Integer.parseInt(txtPuertoTrackers.getText().trim());
 			txtPuertoTrackers.hideError();
 		} else {
 			txtPuertoTrackers.showError();
@@ -432,11 +415,10 @@ public class PanelConfiguracion extends JPanel {
 		}
 
 		if (mensajeError.isEmpty()) {
-			Propiedades.setIP(ip);
-			Propiedades.setPuertoTracker(puertoTracker);
-			Propiedades.setPuertoPeer(puertoPeer);
-			Propiedades.setRutaBaseDatos(rutaBaseDatos);
-			Propiedades.setLookAndFeelClass(lookNFeelHashMap.get(lookandfeel));
+			Properties.setIp(ip);
+			Properties.setPuertoTracker(puertoTracker);
+			Properties.setPuertoPeer(puertoPeer);
+			Properties.setRutaBaseDatos(rutaBaseDatos);
 			try {
 				UIManager.setLookAndFeel(lookNFeelHashMap.get(lookandfeel));
 			} catch (ClassNotFoundException e1) {
@@ -451,8 +433,7 @@ public class PanelConfiguracion extends JPanel {
 			SwingUtilities.updateComponentTreeUI(Ventana.getInstance());
 		} else {
 			mensajeError = "Error en los siguientes campos:\n" + mensajeError;
-			JOptionPane.showMessageDialog(Ventana.getInstance(), mensajeError,
-					"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(Ventana.getInstance(), mensajeError, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		return mensajeError;
 	}

@@ -1,6 +1,7 @@
 package controladores;
 
 import modelos.GestorTrackers;
+import utilidades.LogErrores;
 
 public class ControladorConfiguracion {
 
@@ -8,20 +9,28 @@ public class ControladorConfiguracion {
 
 	}
 
-	public void conectar(final String ip, final int port) {
-		GestorTrackers.getInstance().connect(ip, port);
-		GestorTrackers.getInstance().start();
+	public boolean connect(final String ip, final int port) {
+		try {
+			GestorTrackers.getInstance().connect(ip, port);
+			GestorTrackers.getInstance().start();
+			return true;
+		} catch (Exception e) {
+			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
+			e.printStackTrace();
+			return false;
+		}
 	}
 
-	public void desconectar() {
+	public void disconnect() {
 		GestorTrackers.getInstance().disconnect();
 	}
 
-	public boolean estaConectado() {
+	public boolean isConnected() {
 		return GestorTrackers.getInstance().isEnable();
 	}
 
-	public int numeroTrackers() {
+	public int numberOfTrackers() {
 		return GestorTrackers.getInstance().getTotalTrackers();
 	}
 }

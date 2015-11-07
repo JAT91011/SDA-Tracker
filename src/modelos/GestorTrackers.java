@@ -26,22 +26,22 @@ import vistas.Ventana;
 
 public class GestorTrackers extends Observable implements Runnable {
 
-	private String								ip;
-	private int									port;
-	private static GestorTrackers				instance;
+	private String					ip;
+	private int						port;
+	private static GestorTrackers	instance;
 
 	private boolean								enable;
 	private Tracker								currentTracker;
 	private ConcurrentHashMap<Integer, Tracker>	trackers;
 
-	private Thread								readingThread;
-	private Timer								timerSendKeepAlive;
-	private Timer								timerCheckKeepAlive;
+	private Thread	readingThread;
+	private Timer	timerSendKeepAlive;
+	private Timer	timerCheckKeepAlive;
 
-	private MulticastSocket						socket;
-	private InetAddress							group;
-	private DatagramPacket						messageIn;
-	private byte[]								buffer;
+	private MulticastSocket	socket;
+	private InetAddress		group;
+	private DatagramPacket	messageIn;
+	private byte[]			buffer;
 
 	private GestorTrackers() {
 		this.enable = false;
@@ -135,7 +135,6 @@ public class GestorTrackers extends Observable implements Runnable {
 	 */
 	public synchronized int getAvailableId() {
 		try {
-			System.out.println("Num trackers: " + trackers.size());
 			for (int id = 1; id < Integer.MAX_VALUE; id++) {
 				if (!trackers.containsKey(id)) {
 					return id;
@@ -285,11 +284,12 @@ public class GestorTrackers extends Observable implements Runnable {
 
 	public synchronized void updateTrackerKeepAlive(final int id) {
 		try {
-			System.out.println("ID Recibida: " + id);
+			// System.out.println("ID Recibida: " + id);
 			if (trackers.get(id) == null) {
 				System.out.println("Nuevo tracker encontrado");
 				Tracker t = new Tracker(id, false);
 				t.setLastKeepAlive(new Date());
+				t.setFirstConnection(new Date());
 				addTracker(t);
 			} else {
 				trackers.get(id).setLastKeepAlive(new Date());
@@ -410,7 +410,6 @@ public class GestorTrackers extends Observable implements Runnable {
 
 			int wait = 1;
 			while (wait <= 3) {
-				System.out.println("Esperando " + wait);
 				Thread.sleep(1000);
 				wait++;
 			}
@@ -420,6 +419,7 @@ public class GestorTrackers extends Observable implements Runnable {
 				trackers.get(min).setMaster(true);
 			}
 			this.currentTracker = new Tracker(getAvailableId(), this.trackers.size() == 0);
+			this.currentTracker.setFirstConnection(new Date());
 			if (this.currentTracker.isMaster()) {
 				Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
 			} else {

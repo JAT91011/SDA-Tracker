@@ -7,11 +7,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import vistas.componentes.JSlidePanel;
+
 public class Ventana extends JFrame {
 
 	private static final long	serialVersionUID	= -8641413596663241575L;
 	private static Ventana		instance;
 	private JPanel				container;
+	private JSlidePanel<JFrame>	slider;
 
 	private Ventana() {
 		super();
@@ -19,12 +22,17 @@ public class Ventana extends JFrame {
 		setIconImage(null);
 		setSize(600, 400);
 		setIconImage((new ImageIcon("icons/app-icon.png")).getImage());
-		setMinimumSize(new Dimension(650, 450));
+		setMinimumSize(new Dimension(700, 500));
 		setTitle("Tracker");
 		setLocationRelativeTo(null);
 
-		JPanel container = new JPanel();
-		getContentPane().add(container, BorderLayout.CENTER);
+		this.slider = new JSlidePanel<JFrame>(this);
+		this.container = slider.getBasePanel();
+		getContentPane().add(this.container, BorderLayout.CENTER);
+	}
+
+	public JSlidePanel<JFrame> getSlider() {
+		return this.slider;
 	}
 
 	public void setContainer(JPanel panel) {

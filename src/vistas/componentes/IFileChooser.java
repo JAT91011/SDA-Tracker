@@ -13,7 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
-import utilidades.Propiedades;
+import utilidades.Properties;
 import vistas.Ventana;
 
 public class IFileChooser extends JPanel {
@@ -37,10 +37,10 @@ public class IFileChooser extends JPanel {
 		gridBagLayout.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
-		file = new File(Propiedades.getRutaBaseDatos());
+		file = new File(Properties.getRutaBaseDatos());
 		textFieldPath = new ITextField("");
 		textFieldPath.setFont(new Font("Calibri", Font.PLAIN, 14));
-		textFieldPath.setText(Propiedades.getRutaBaseDatos());
+		textFieldPath.setText(Properties.getRutaBaseDatos());
 		textFieldPath.setFocusable(false);
 		textFieldPath.setEditable(false);
 		textFieldPath.setErrorIcon(new ImageIcon("icons/error-icon.png"));

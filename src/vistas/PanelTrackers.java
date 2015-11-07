@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -27,7 +28,7 @@ public class PanelTrackers extends JPanel implements Observer {
 	private String[]				header;
 
 	public PanelTrackers() {
-		setOpaque(false);
+		setBackground(new Color(102, 205, 170));
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };
@@ -36,16 +37,18 @@ public class PanelTrackers extends JPanel implements Observer {
 		gridBagLayout.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
-		header = new String[3];
+		header = new String[4];
 		header[0] = "ID";
 		header[1] = "Master";
 		header[2] = "Ultimo keep alive";
+		header[3] = "Primera conexión";
 		final String[][] content = new String[1][header.length];
 
 		modelTable = new DefaultTableModel();
 		modelTable.setDataVector(content, header);
 
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBackground(new Color(102, 205, 170));
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.insets = new Insets(10, 10, 10, 10);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
@@ -89,6 +92,8 @@ public class PanelTrackers extends JPanel implements Observer {
 						tablaTrackers.getModel().setValueAt(entry.getValue().isMaster() ? "Maestro" : "Esclavo", i, 1);
 						tablaTrackers.getModel().setValueAt(
 								Long.toString(entry.getValue().getDifferenceBetweenKeepAlive()) + " segundos", i, 2);
+						tablaTrackers.getModel().setValueAt(new SimpleDateFormat("HH:mm:ss - dd/MM/yyyy")
+								.format(entry.getValue().getFirstConnection()), i, 3);
 						i++;
 					}
 				}
