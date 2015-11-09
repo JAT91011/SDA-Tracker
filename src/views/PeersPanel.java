@@ -1,4 +1,4 @@
-package vistas;
+package views;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,7 +15,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-public class PanelPeers extends JPanel implements Observer {
+public class PeersPanel extends JPanel implements Observer {
 
 	private static final long		serialVersionUID	= 4986034677227823532L;
 	private JTable					tablePeers;
@@ -23,7 +23,7 @@ public class PanelPeers extends JPanel implements Observer {
 	private JTable					tableContent;
 	private DefaultTableModel		modelTableContent;
 
-	public PanelPeers() {
+	public PeersPanel() {
 		setBackground(new Color(255, 218, 185));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 450, 0 };

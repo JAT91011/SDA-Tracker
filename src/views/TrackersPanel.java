@@ -1,4 +1,4 @@
-package vistas;
+package views;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -16,18 +16,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import entidades.Tracker;
-import modelos.GestorTrackers;
-import utilidades.LogErrores;
+import entities.Tracker;
+import models.TrackersManager;
+import utilities.ErrorsLog;
 
-public class PanelTrackers extends JPanel implements Observer {
+public class TrackersPanel extends JPanel implements Observer {
 
 	private static final long		serialVersionUID	= 1276595089834953384L;
-	private JTable					tablaTrackers;
+	private JTable					trackersTable;
 	private final DefaultTableModel	modelTable;
 	private String[]				header;
 
-	public PanelTrackers() {
+	public TrackersPanel() {
 		setBackground(new Color(102, 205, 170));
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -56,50 +56,50 @@ public class PanelTrackers extends JPanel implements Observer {
 		gbc_scrollPane.gridy = 0;
 		add(scrollPane, gbc_scrollPane);
 
-		tablaTrackers = new JTable(modelTable);
-		scrollPane.setViewportView(tablaTrackers);
+		trackersTable = new JTable(modelTable);
+		scrollPane.setViewportView(trackersTable);
 
-		tablaTrackers.getTableHeader().setReorderingAllowed(false);
-		tablaTrackers.setShowVerticalLines(true);
-		tablaTrackers.setShowHorizontalLines(true);
-		tablaTrackers.setDragEnabled(false);
-		tablaTrackers.setSelectionForeground(Color.WHITE);
-		tablaTrackers.setSelectionBackground(Color.BLUE);
-		tablaTrackers.setForeground(Color.BLACK);
-		tablaTrackers.setBackground(Color.WHITE);
-		tablaTrackers.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 14));
-		tablaTrackers.setRowHeight(30);
+		trackersTable.getTableHeader().setReorderingAllowed(false);
+		trackersTable.setShowVerticalLines(true);
+		trackersTable.setShowHorizontalLines(true);
+		trackersTable.setDragEnabled(false);
+		trackersTable.setSelectionForeground(Color.WHITE);
+		trackersTable.setSelectionBackground(Color.BLUE);
+		trackersTable.setForeground(Color.BLACK);
+		trackersTable.setBackground(Color.WHITE);
+		trackersTable.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 14));
+		trackersTable.setRowHeight(30);
 
-		tablaTrackers.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 15));
+		trackersTable.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 15));
 
-		GestorTrackers.getInstance().addObserver(this);
+		TrackersManager.getInstance().addObserver(this);
 	}
 
 	@Override
 	public synchronized void update(Observable o, Object arg) {
-		if (o == GestorTrackers.getInstance()) {
+		if (o == TrackersManager.getInstance()) {
 			try {
-				ConcurrentHashMap<Integer, Tracker> trackers = GestorTrackers.getInstance().getTrackers();
+				ConcurrentHashMap<Integer, Tracker> trackers = TrackersManager.getInstance().getTrackers();
 
-				if (trackers.size() != tablaTrackers.getRowCount()) {
+				if (trackers.size() != trackersTable.getRowCount()) {
 					modelTable.setDataVector(new String[trackers.size()][header.length], header);
 				}
 
 				int i = 0;
 				for (Map.Entry<Integer, Tracker> entry : trackers.entrySet()) {
 					if (entry.getValue() != null && entry.getValue().getDifferenceBetweenKeepAlive() < 2) {
-						tablaTrackers.getModel().setValueAt(Integer.toString(entry.getValue().getId()), i, 0);
-						tablaTrackers.getModel().setValueAt(entry.getValue().isMaster() ? "Maestro" : "Esclavo", i, 1);
-						tablaTrackers.getModel().setValueAt(
+						trackersTable.getModel().setValueAt(Integer.toString(entry.getValue().getId()), i, 0);
+						trackersTable.getModel().setValueAt(entry.getValue().isMaster() ? "Maestro" : "Esclavo", i, 1);
+						trackersTable.getModel().setValueAt(
 								Long.toString(entry.getValue().getDifferenceBetweenKeepAlive()) + " segundos", i, 2);
-						tablaTrackers.getModel().setValueAt(new SimpleDateFormat("HH:mm:ss - dd/MM/yyyy")
+						trackersTable.getModel().setValueAt(new SimpleDateFormat("HH:mm:ss - dd/MM/yyyy")
 								.format(entry.getValue().getFirstConnection()), i, 3);
 						i++;
 					}
 				}
 
 			} catch (Exception e) {
-				LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+				ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.toString());
 				e.printStackTrace();
 			}

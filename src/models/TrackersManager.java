@@ -1,4 +1,4 @@
-package modelos;
+package models;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,20 +15,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
-import entidades.Tracker;
-import utilidades.LogErrores;
-import vistas.Ventana;
+import entities.Tracker;
+import utilities.ErrorsLog;
+import views.Window;
 
 /**
  * Implementa la funcionalidad especifica del protocolo UDP de un tracker
  * bitTorrent.
  */
 
-public class GestorTrackers extends Observable implements Runnable {
+public class TrackersManager extends Observable implements Runnable {
 
 	private String								ip;
 	private int									port;
-	private static GestorTrackers				instance;
+	private static TrackersManager				instance;
 
 	private boolean								enable;
 	private Tracker								currentTracker;
@@ -43,7 +43,7 @@ public class GestorTrackers extends Observable implements Runnable {
 	private DatagramPacket						messageIn;
 	private byte[]								buffer;
 
-	private GestorTrackers() {
+	private TrackersManager() {
 		this.enable = false;
 		this.trackers = new ConcurrentHashMap<Integer, Tracker>();
 
@@ -52,7 +52,7 @@ public class GestorTrackers extends Observable implements Runnable {
 				try {
 					sendData(createDatagram(7, ByteBuffer.allocate(4).putInt(currentTracker.getId()).array())[0]);
 				} catch (Exception ex) {
-					LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+					ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 					}.getClass().getEnclosingMethod().getName(), ex.toString());
 					ex.printStackTrace();
 				}
@@ -73,7 +73,7 @@ public class GestorTrackers extends Observable implements Runnable {
 						}
 					}
 				} catch (Exception ex) {
-					LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+					ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 					}.getClass().getEnclosingMethod().getName(), ex.toString());
 					ex.printStackTrace();
 				}
@@ -101,7 +101,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.enable = true;
 			return true;
 		} catch (IOException e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 			return false;
@@ -122,7 +122,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.removeTrackers();
 			return true;
 		} catch (IOException e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 			return false;
@@ -143,7 +143,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			}
 			return -1;
 		} catch (Exception ex) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), ex.toString());
 			ex.printStackTrace();
 			return -1;
@@ -159,7 +159,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			setChanged();
 			notifyObservers();
 		} catch (Exception ex) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), ex.toString());
 			ex.printStackTrace();
 		}
@@ -177,7 +177,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			setChanged();
 			notifyObservers();
 		} catch (Exception ex) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), ex.toString());
 			ex.printStackTrace();
 		}
@@ -196,7 +196,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			setChanged();
 			notifyObservers();
 		} catch (Exception ex) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), ex.toString());
 			ex.printStackTrace();
 		}
@@ -213,7 +213,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			setChanged();
 			notifyObservers();
 		} catch (Exception ex) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), ex.toString());
 			ex.printStackTrace();
 		}
@@ -276,7 +276,7 @@ public class GestorTrackers extends Observable implements Runnable {
 					break;
 			}
 		} catch (Exception ex) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), ex.toString());
 			ex.printStackTrace();
 		}
@@ -297,7 +297,7 @@ public class GestorTrackers extends Observable implements Runnable {
 				setTracker(trackers.get(id));
 			}
 		} catch (Exception ex) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), ex.toString());
 			ex.printStackTrace();
 		}
@@ -372,7 +372,7 @@ public class GestorTrackers extends Observable implements Runnable {
 				}
 			}
 		} catch (Exception e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 		}
@@ -397,7 +397,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			DatagramPacket message = new DatagramPacket(data, data.length, group, this.port);
 			socket.send(message);
 		} catch (IOException e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 		}
@@ -422,15 +422,15 @@ public class GestorTrackers extends Observable implements Runnable {
 			this.currentTracker = new Tracker(getAvailableId(), this.trackers.size() == 0);
 			this.currentTracker.setFirstConnection(new Date());
 			if (this.currentTracker.isMaster()) {
-				Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
+				Window.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
 			} else {
-				Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: SLAVE]");
+				Window.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: SLAVE]");
 			}
 			addTracker(currentTracker);
 			this.timerSendKeepAlive.start();
 
 		} catch (Exception e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 		}
@@ -449,7 +449,7 @@ public class GestorTrackers extends Observable implements Runnable {
 			}
 			return id;
 		} catch (Exception e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 			return 0;
@@ -465,12 +465,12 @@ public class GestorTrackers extends Observable implements Runnable {
 			int id = getLowerId();
 			if (id == currentTracker.getId()) {
 				currentTracker.setMaster(true);
-				Ventana.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
+				Window.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
 			}
 			trackers.get(getLowerId()).setMaster(true);
 			setTracker(trackers.get(getLowerId()));
 		} catch (Exception ex) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), ex.toString());
 			ex.printStackTrace();
 		}
@@ -489,7 +489,7 @@ public class GestorTrackers extends Observable implements Runnable {
 				processData(this.buffer);
 			}
 		} catch (Exception e) {
-			LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 		}
@@ -507,15 +507,15 @@ public class GestorTrackers extends Observable implements Runnable {
 		return trackers.size();
 	}
 
-	public static GestorTrackers getInstance() {
+	public static TrackersManager getInstance() {
 		if (instance == null) {
-			instance = new GestorTrackers();
+			instance = new TrackersManager();
 		}
 		return instance;
 	}
 
 	public static void main(String[] strings) {
-		GestorTrackers.getInstance().connect("228.5.6.7", 5000);
-		GestorTrackers.getInstance().start();
+		TrackersManager.getInstance().connect("228.5.6.7", 5000);
+		TrackersManager.getInstance().start();
 	}
 }

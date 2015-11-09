@@ -1,4 +1,4 @@
-package vistas;
+package views;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -10,33 +10,38 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.InetAddress;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import controladores.ControladorConfiguracion;
-import utilidades.Properties;
-import utilidades.Utils;
-import vistas.componentes.ITextField;
+import controllers.Controller;
+import utilities.ErrorsLog;
+import utilities.Properties;
+import views.components.ITextField;
 
 public class StartPanel extends JPanel implements ActionListener {
 
-	private static final long			serialVersionUID	= -1527615628965557447L;
+	private static final long	serialVersionUID	= -1527615628965557447L;
 
-	private ControladorConfiguracion	controladorConfiguracion;
+	private Controller			configController;
 
-	private ITextField					txtIp;
-	private ITextField					txtPortTrackers;
-	private ITextField					txtPortPeers;
-	private JButton						btnNext;
-	private JLabel						lblMessage;
-	private JPanel						panLoading;
+	private ITextField			txtIp;
+	private ITextField			txtPortTrackers;
+	private ITextField			txtPortPeers;
+	private JButton				btnNext;
+	private JLabel				lblMessage;
+	private JPanel				panLoading;
+
+	public static String		IPADDRESS_PATTERN	= "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	public StartPanel() {
 
-		controladorConfiguracion = new ControladorConfiguracion();
+		configController = new Controller();
 
 		setBackground(new Color(100, 149, 237));
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -188,79 +193,90 @@ public class StartPanel extends JPanel implements ActionListener {
 			txtIp.setText(Properties.getIp());
 			txtIp.showAsHint(false);
 		}
-		if (Properties.getPuertoTracker() != 0) {
-			txtPortTrackers.setText(Integer.toString(Properties.getPuertoTracker()));
+		if (Properties.getPortTracker() != 0) {
+			txtPortTrackers.setText(Integer.toString(Properties.getPortTracker()));
 			txtPortTrackers.showAsHint(false);
 		}
-		if (Properties.getPuertoPeer() != 0) {
-			txtPortPeers.setText(Integer.toString(Properties.getPuertoPeer()));
+		if (Properties.getPortPeer() != 0) {
+			txtPortPeers.setText(Integer.toString(Properties.getPortPeer()));
 			txtPortPeers.showAsHint(false);
 		}
 	}
 
 	public boolean save() {
+		try {
+			boolean errors = false;
+			String ip = txtIp.getText().trim();
+			int portTracker = 0;
+			int portPeer = 0;
 
-		boolean errors = false;
-		String ip = txtIp.getText().trim();
-		int portTracker = 0;
-		int portPeer = 0;
-
-		if (!ip.matches(Utils.IPADDRESS_PATTERN)) {
-			errors = true;
-			txtIp.showError();
-		} else {
-			txtIp.hideError();
-		}
-
-		if (!txtPortTrackers.getText().trim().isEmpty()) {
-			portTracker = Integer.parseInt(txtPortTrackers.getText().trim());
-			txtPortTrackers.hideError();
-		} else {
-			errors = true;
-			txtPortTrackers.showError();
-		}
-
-		if (!txtPortPeers.getText().trim().isEmpty()) {
-			portPeer = Integer.parseInt(txtPortPeers.getText().trim());
-			txtPortPeers.hideError();
-		} else {
-			errors = true;
-			txtPortPeers.showError();
-		}
-
-		if (portTracker > 65535 || portTracker < 1) {
-			errors = true;
-			txtPortTrackers.showError();
-		} else {
-			txtPortTrackers.hideError();
-		}
-
-		if (portPeer > 65535 || portPeer < 1) {
-			errors = true;
-			txtPortPeers.showError();
-		} else {
-			txtPortPeers.hideError();
-		}
-
-		if (portTracker == portPeer) {
-			errors = true;
-			txtPortTrackers.showError();
-			txtPortPeers.showError();
-		} else {
-			if (portPeer != 0) {
-				txtPortPeers.hideError();
+			if (!ip.matches(IPADDRESS_PATTERN)) {
+				errors = true;
+				txtIp.showError();
+			} else {
+				if (!InetAddress.getByName(ip).isMulticastAddress()) {
+					errors = true;
+					txtIp.showError();
+				} else {
+					txtIp.hideError();
+				}
 			}
-			if (portTracker != 0) {
+
+			if (!txtPortTrackers.getText().trim().isEmpty()) {
+				portTracker = Integer.parseInt(txtPortTrackers.getText().trim());
+				txtPortTrackers.hideError();
+			} else {
+				errors = true;
+				txtPortTrackers.showError();
+			}
+
+			if (!txtPortPeers.getText().trim().isEmpty()) {
+				portPeer = Integer.parseInt(txtPortPeers.getText().trim());
+				txtPortPeers.hideError();
+			} else {
+				errors = true;
+				txtPortPeers.showError();
+			}
+
+			if (portTracker > 65535 || portTracker < 1) {
+				errors = true;
+				txtPortTrackers.showError();
+			} else {
 				txtPortTrackers.hideError();
 			}
-		}
 
-		if (!errors) {
-			Properties.setIp(ip);
-			Properties.setPuertoTracker(portTracker);
-			Properties.setPuertoPeer(portPeer);
-			return true;
-		} else {
+			if (portPeer > 65535 || portPeer < 1) {
+				errors = true;
+				txtPortPeers.showError();
+			} else {
+				txtPortPeers.hideError();
+			}
+
+			if (portTracker == portPeer) {
+				errors = true;
+				txtPortTrackers.showError();
+				txtPortPeers.showError();
+			} else {
+				if (portPeer != 0) {
+					txtPortPeers.hideError();
+				}
+				if (portTracker != 0) {
+					txtPortTrackers.hideError();
+				}
+			}
+
+			if (!errors) {
+				Properties.setIp(ip);
+				Properties.setPortTracker(portTracker);
+				Properties.setPortPeer(portPeer);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.toString());
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -270,11 +286,10 @@ public class StartPanel extends JPanel implements ActionListener {
 			if (save()) {
 				this.panLoading.setVisible(true);
 				this.updateUI();
-				if (controladorConfiguracion.connect(txtIp.getText().trim(),
+				if (configController.connect(txtIp.getText().trim(),
 						Integer.parseInt(txtPortTrackers.getText().trim()))) {
-					// Cambio de panel
 					this.panLoading.setVisible(false);
-					Ventana.getInstance().getSlider().slideLeft();
+					Window.getInstance().getSlider().slideLeft();
 				} else {
 					System.out.println("No se ha podido conectar");
 				}

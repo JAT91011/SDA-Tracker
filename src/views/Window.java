@@ -1,4 +1,4 @@
-package vistas;
+package views;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -7,16 +7,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import vistas.componentes.JSlidePanel;
+import views.components.JSlidePanel;
 
-public class Ventana extends JFrame {
+public class Window extends JFrame {
 
 	private static final long	serialVersionUID	= -8641413596663241575L;
-	private static Ventana		instance;
+	private static Window		instance;
 	private JPanel				container;
 	private JSlidePanel<JFrame>	slider;
 
-	private Ventana() {
+	private Window() {
 		super();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setIconImage(null);
@@ -43,9 +43,9 @@ public class Ventana extends JFrame {
 		getContentPane().add(container, BorderLayout.CENTER);
 	}
 
-	public static Ventana getInstance() {
+	public static Window getInstance() {
 		if (instance == null) {
-			instance = new Ventana();
+			instance = new Window();
 		}
 		return instance;
 	}

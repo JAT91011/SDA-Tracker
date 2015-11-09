@@ -1,4 +1,4 @@
-package vistas;
+package views;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -13,10 +13,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import controladores.ControladorConfiguracion;
-import vistas.componentes.JSlidePanel;
+import controllers.Controller;
+import views.components.JSlidePanel;
 
-public class PanelPestanas extends JPanel implements MouseListener {
+public class TabsPanel extends JPanel implements MouseListener {
 
 	private static final long serialVersionUID = 8155818731609154350L;
 
@@ -29,12 +29,12 @@ public class PanelPestanas extends JPanel implements MouseListener {
 	private JPanel	container;
 	private boolean	watchingTrackers;
 
-	private ControladorConfiguracion controladorConfiguracion;
+	private Controller configController;
 
-	public PanelPestanas() {
+	public TabsPanel() {
 		setOpaque(true);
 
-		this.controladorConfiguracion = new ControladorConfiguracion();
+		this.configController = new Controller();
 		this.slider = new JSlidePanel<JPanel>(this);
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -93,15 +93,15 @@ public class PanelPestanas extends JPanel implements MouseListener {
 		add(container, gbc_panContent);
 
 		this.watchingTrackers = true;
-		this.slider.addComponent(new PanelTrackers());
-		this.slider.addComponent(new PanelPeers());
+		this.slider.addComponent(new TrackersPanel());
+		this.slider.addComponent(new PeersPanel());
 	}
 
 	public void mouseClicked(MouseEvent e) {
 		if (e.getSource() == lblDisconnect) {
-			this.controladorConfiguracion.disconnect();
-			Ventana.getInstance().setTitle("Tracker");
-			Ventana.getInstance().getSlider().slideRight();
+			this.configController.disconnect();
+			Window.getInstance().setTitle("Tracker");
+			Window.getInstance().getSlider().slideRight();
 		} else if (e.getSource() == lblTrackers) {
 			if (!this.watchingTrackers) {
 				this.slider.slideTop();

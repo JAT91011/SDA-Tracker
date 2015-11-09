@@ -1,15 +1,15 @@
-package aplicacion;
+package application;
 
 import java.awt.EventQueue;
 
 import javax.swing.UIManager;
 
-import utilidades.LogErrores;
-import vistas.PanelPestanas;
-import vistas.StartPanel;
-import vistas.Ventana;
+import utilities.ErrorsLog;
+import views.StartPanel;
+import views.TabsPanel;
+import views.Window;
 
-public class Aplicacion {
+public class Application {
 
 	public static void main(final String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -17,12 +17,12 @@ public class Aplicacion {
 				try {
 					UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 					StartPanel panel = new StartPanel();
-					Ventana.getInstance().getSlider().addComponent(panel);
-					Ventana.getInstance().getSlider().addComponent(new PanelPestanas());
-					Ventana.getInstance().setVisible(true);
+					Window.getInstance().getSlider().addComponent(panel);
+					Window.getInstance().getSlider().addComponent(new TabsPanel());
+					Window.getInstance().setVisible(true);
 					panel.getNextButton().requestFocus();
 				} catch (Exception e) {
-					LogErrores.getInstance().writeLog(this.getClass().getName(), new Object() {
+					ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.toString());
 					e.printStackTrace();
 				}

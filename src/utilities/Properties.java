@@ -1,4 +1,4 @@
-package utilidades;
+package utilities;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,14 +10,14 @@ import java.io.Serializable;
 
 public class Properties implements Serializable {
 
-	private static final long serialVersionUID = -7184695896737258947L;
+	private static final long	serialVersionUID	= -7184695896737258947L;
 
-	private static Properties properties;
+	private static Properties	properties;
 
-	private String	ip;
-	private int		portTracker;
-	private int		portPeer;
-	private String	databasePath;
+	private String				ip;
+	private int					portTracker;
+	private int					portPeer;
+	private String				databasePath;
 
 	private Properties(final String ip, final int portTracker, final int portPeer, String databasePath) {
 
@@ -69,14 +69,14 @@ public class Properties implements Serializable {
 		properties.update();
 	}
 
-	public static int getPuertoTracker() {
+	public static int getPortTracker() {
 		if (properties == null) {
 			init();
 		}
 		return properties.portTracker;
 	}
 
-	public static void setPuertoTracker(final int portTracker) {
+	public static void setPortTracker(final int portTracker) {
 		if (properties == null) {
 			init();
 		}
@@ -84,14 +84,14 @@ public class Properties implements Serializable {
 		properties.update();
 	}
 
-	public static int getPuertoPeer() {
+	public static int getPortPeer() {
 		if (properties == null) {
 			init();
 		}
 		return properties.portPeer;
 	}
 
-	public static void setPuertoPeer(final int portPeer) {
+	public static void setPortPeer(final int portPeer) {
 		if (properties == null) {
 			init();
 		}
@@ -99,14 +99,14 @@ public class Properties implements Serializable {
 		properties.update();
 	}
 
-	public static String getRutaBaseDatos() {
+	public static String getDatabasePath() {
 		if (properties == null) {
 			init();
 		}
 		return properties.databasePath;
 	}
 
-	public static void setRutaBaseDatos(final String databasePath) {
+	public static void setDatabasePath(final String databasePath) {
 		if (properties == null) {
 			init();
 		}
