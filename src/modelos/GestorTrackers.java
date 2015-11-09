@@ -26,22 +26,22 @@ import vistas.Ventana;
 
 public class GestorTrackers extends Observable implements Runnable {
 
-	private String					ip;
-	private int						port;
-	private static GestorTrackers	instance;
+	private String								ip;
+	private int									port;
+	private static GestorTrackers				instance;
 
 	private boolean								enable;
 	private Tracker								currentTracker;
 	private ConcurrentHashMap<Integer, Tracker>	trackers;
 
-	private Thread	readingThread;
-	private Timer	timerSendKeepAlive;
-	private Timer	timerCheckKeepAlive;
+	private Thread								readingThread;
+	private Timer								timerSendKeepAlive;
+	private Timer								timerCheckKeepAlive;
 
-	private MulticastSocket	socket;
-	private InetAddress		group;
-	private DatagramPacket	messageIn;
-	private byte[]			buffer;
+	private MulticastSocket						socket;
+	private InetAddress							group;
+	private DatagramPacket						messageIn;
+	private byte[]								buffer;
 
 	private GestorTrackers() {
 		this.enable = false;
@@ -64,7 +64,8 @@ public class GestorTrackers extends Observable implements Runnable {
 				try {
 					for (Map.Entry<Integer, Tracker> entry : trackers.entrySet()) {
 						if (entry.getValue().getDifferenceBetweenKeepAlive() > 2) {
-							System.out.println("Has tardado: " + entry.getValue().getId());
+							// System.out.println("Has tardado: " +
+							// entry.getValue().getId());
 							removeTracker(entry.getValue().getId());
 							if (entry.getValue().isMaster()) {
 								updateMaster();
@@ -286,7 +287,7 @@ public class GestorTrackers extends Observable implements Runnable {
 		try {
 			// System.out.println("ID Recibida: " + id);
 			if (trackers.get(id) == null) {
-				System.out.println("Nuevo tracker encontrado");
+				// System.out.println("Nuevo tracker encontrado");
 				Tracker t = new Tracker(id, false);
 				t.setLastKeepAlive(new Date());
 				t.setFirstConnection(new Date());

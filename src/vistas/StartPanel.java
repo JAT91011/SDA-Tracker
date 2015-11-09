@@ -23,16 +23,16 @@ import vistas.componentes.ITextField;
 
 public class StartPanel extends JPanel implements ActionListener {
 
-	private static final long serialVersionUID = -1527615628965557447L;
+	private static final long			serialVersionUID	= -1527615628965557447L;
 
-	private ControladorConfiguracion controladorConfiguracion;
+	private ControladorConfiguracion	controladorConfiguracion;
 
-	private ITextField	txtIp;
-	private ITextField	txtPortTrackers;
-	private ITextField	txtPortPeers;
-	private JButton		btnNext;
-	private JLabel		lblMessage;
-	private JPanel		panLoading;
+	private ITextField					txtIp;
+	private ITextField					txtPortTrackers;
+	private ITextField					txtPortPeers;
+	private JButton						btnNext;
+	private JLabel						lblMessage;
+	private JPanel						panLoading;
 
 	public StartPanel() {
 
@@ -56,7 +56,7 @@ public class StartPanel extends JPanel implements ActionListener {
 		gbc_lblIpAddress.gridy = 1;
 		add(lblIpAddress, gbc_lblIpAddress);
 
-		txtIp = new ITextField("127.0.0.1");
+		txtIp = new ITextField("228.5.6.7");
 		txtIp.setErrorIcon(new ImageIcon("icons/error-icon.png"));
 		GridBagConstraints gbc_txtIp = new GridBagConstraints();
 		gbc_txtIp.insets = new Insets(0, 5, 5, 5);
