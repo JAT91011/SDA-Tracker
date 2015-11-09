@@ -26,6 +26,8 @@ import views.Window;
 
 public class TrackersManager extends Observable implements Runnable {
 
+	private static int							DATAGRAM_LENGTH	= 2048;
+
 	private String								ip;
 	private int									port;
 	private static TrackersManager				instance;
@@ -50,7 +52,7 @@ public class TrackersManager extends Observable implements Runnable {
 		this.timerSendKeepAlive = new Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					sendData(createDatagram(7, ByteBuffer.allocate(4).putInt(currentTracker.getId()).array())[0]);
+					sendData(createDatagram(5, ByteBuffer.allocate(4).putInt(currentTracker.getId()).array())[0]);
 				} catch (Exception ex) {
 					ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 					}.getClass().getEnclosingMethod().getName(), ex.toString());
@@ -243,31 +245,23 @@ public class TrackersManager extends Observable implements Runnable {
 
 					break;
 
-				case 1: // GET_DATA
+				case 1: // DB REPLICATION
 
 					break;
 
-				case 2: // DB REPLICATION
+				case 2: // READY_TO_SAVE
 
 					break;
 
-				case 3: // Trackers IDs
+				case 3: // SAVE_DATA
 
 					break;
 
-				case 4: // READY_TO_SAVE
+				case 4: // DO_NOT_SAVE_DATA
 
 					break;
 
-				case 5: // SAVE_DATA
-
-					break;
-
-				case 6: // DO_NOT_SAVE_DATA
-
-					break;
-
-				case 7: // KEEP_ALIVE
+				case 5: // KEEP_ALIVE
 					updateTrackerKeepAlive(ByteBuffer.wrap(Arrays.copyOfRange(data, 16, 20)).getInt());
 					break;
 
@@ -292,6 +286,10 @@ public class TrackersManager extends Observable implements Runnable {
 				t.setLastKeepAlive(new Date());
 				t.setFirstConnection(new Date());
 				addTracker(t);
+				if (this.currentTracker != null && this.currentTracker.isMaster()) {
+					// Enviar fichero db
+					System.out.println("Te envio fichero tracker con la id: " + t.getId());
+				}
 			} else {
 				trackers.get(id).setLastKeepAlive(new Date());
 				setTracker(trackers.get(id));
@@ -318,15 +316,15 @@ public class TrackersManager extends Observable implements Runnable {
 		try {
 			int length = data.length;
 			int partitions = 0;
-			if (length < 48) {
+			if (length < (DATAGRAM_LENGTH - 16)) {
 				partitions = 1;
 			} else {
-				partitions = length / 48;
+				partitions = length / (DATAGRAM_LENGTH - 16);
 			}
 
 			// System.out.println("Data: " + Arrays.toString(data));
 
-			datagrams = new byte[partitions][64];
+			datagrams = new byte[partitions][DATAGRAM_LENGTH];
 			for (int i = 0; i < partitions; i++) {
 
 				// CODE
@@ -361,27 +359,26 @@ public class TrackersManager extends Observable implements Runnable {
 						datagrams[i][16 + j] = data[j];
 					}
 				} else {
-					byte[] lengthArray = ByteBuffer.allocate(4).putInt(48).array();
+					byte[] lengthArray = ByteBuffer.allocate(4).putInt(DATAGRAM_LENGTH - 16).array();
 					datagrams[i][12] = lengthArray[0];
 					datagrams[i][13] = lengthArray[1];
 					datagrams[i][14] = lengthArray[2];
 					datagrams[i][15] = lengthArray[3];
-					for (int j = 0; j < 48; j++) {
+					for (int j = 0; j < DATAGRAM_LENGTH - 16; j++) {
 						datagrams[i][16 + j] = data[j];
 					}
 				}
+			}
+
+			System.out.println("Datagrama creado");
+			for (int i = 0; i < partitions; i++) {
+				System.out.println("Datagrama " + (i + 1) + ": " + Arrays.toString(datagrams[i]));
 			}
 		} catch (Exception e) {
 			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
 			e.printStackTrace();
 		}
-
-		// System.out.println("Datagrama creado");
-		// for (int i = 0; i < partitions; i++) {
-		// System.out.println("Datagrama " + (i + 1) + ": " +
-		// Arrays.toString(datagrams[i]));
-		// }
 
 		return datagrams;
 	}
@@ -483,7 +480,7 @@ public class TrackersManager extends Observable implements Runnable {
 	public void run() {
 		try {
 			while (this.enable) {
-				this.buffer = new byte[64];
+				this.buffer = new byte[DATAGRAM_LENGTH];
 				this.messageIn = new DatagramPacket(buffer, buffer.length);
 				this.socket.receive(messageIn);
 				processData(this.buffer);
