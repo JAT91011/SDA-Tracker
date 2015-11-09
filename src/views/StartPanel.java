@@ -284,17 +284,39 @@ public class StartPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btnNext) {
 			if (save()) {
-				this.panLoading.setVisible(true);
-				this.updateUI();
-				if (configController.connect(txtIp.getText().trim(),
-						Integer.parseInt(txtPortTrackers.getText().trim()))) {
-					this.panLoading.setVisible(false);
-					Window.getInstance().getSlider().slideLeft();
-				} else {
-					System.out.println("No se ha podido conectar");
-				}
-				this.panLoading.setVisible(false);
+				new ConnectThread(this, this.configController, txtIp.getText().trim(),
+						Integer.parseInt(txtPortTrackers.getText().trim())).start();
 			}
+		}
+	}
+
+	public JPanel getLoadingPanel() {
+		return this.panLoading;
+	}
+
+}
+
+class ConnectThread extends Thread {
+
+	private Controller	controller;
+	private String		ip;
+	private int			port;
+	private StartPanel	startPanel;
+
+	public ConnectThread(final StartPanel startPanel, final Controller controller, final String ip, final int port) {
+		this.startPanel = startPanel;
+		this.controller = controller;
+		this.ip = ip;
+		this.port = port;
+	}
+
+	public void run() {
+		this.startPanel.getLoadingPanel().setVisible(true);
+		if (this.controller.connect(this.ip, this.port)) {
+			this.startPanel.getLoadingPanel().setVisible(false);
+			Window.getInstance().getSlider().slideLeft();
+		} else {
+			System.out.println("No se ha podido conectar");
 		}
 	}
 }
