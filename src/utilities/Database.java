@@ -1,5 +1,6 @@
 package utilities;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,6 +19,11 @@ public class Database {
 
 	public void createDatabase(final int id) {
 		try {
+			File file = new File(Properties.getDatabasePath().replace("#", Integer.toString(id)));
+			if (file.exists()) {
+				file.delete();
+			}
+
 			Class.forName("org.sqlite.JDBC");
 			this.connection = DriverManager
 					.getConnection("jdbc:sqlite:" + Properties.getDatabasePath().replace("#", Integer.toString(id)));
