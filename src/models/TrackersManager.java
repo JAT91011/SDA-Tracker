@@ -2,6 +2,7 @@ package models;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -10,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -42,6 +44,8 @@ public class TrackersManager extends Observable implements Runnable {
 	private Tracker									currentTracker;
 	private ConcurrentHashMap<Integer, Tracker>		trackers;
 	private ConcurrentHashMap<Integer, byte[][]>	trackersDb;
+	private ArrayList<byte[]>						databaseDatagram;
+	private boolean									isDatabaseCreated;
 
 	private Thread									readingThread;
 	private Timer									timerSendKeepAlive;
@@ -56,6 +60,8 @@ public class TrackersManager extends Observable implements Runnable {
 		this.enable = false;
 		this.trackers = new ConcurrentHashMap<Integer, Tracker>();
 		this.trackersDb = new ConcurrentHashMap<Integer, byte[][]>();
+		this.databaseDatagram = new ArrayList<byte[]>();
+		this.isDatabaseCreated = false;
 
 		this.timerSendKeepAlive = new Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -251,15 +257,15 @@ public class TrackersManager extends Observable implements Runnable {
 			// System.out.println("Codigo recibido: " + code);
 			switch (code) {
 				case 0: // OK
-
+					if (this.currentTracker.isMaster()) {
+						processOkMessage(data);
+					}
 					break;
 
 				case 1: // DB REPLICATION
-					// Recibir contenido y almacenarlo en ArrayList de bytes
-					// Pedir siguiente partición si existe, mandandole la Id
-					// propia OK <Id><NumPartition>
-
-					System.out.println();
+					if (!isDatabaseCreated) {
+						loadDatabaseData(data);
+					}
 					break;
 
 				case 2: // READY_TO_SAVE
@@ -290,6 +296,73 @@ public class TrackersManager extends Observable implements Runnable {
 		// System.out.println("Datos recibidos: " + Arrays.toString(data));
 	}
 
+	private synchronized void processOkMessage(final byte[] data) {
+		int length = ByteBuffer.wrap(Arrays.copyOfRange(data, 12, 16)).getInt();
+		int id = ByteBuffer.wrap(Arrays.copyOfRange(data, 16, 16 + length)).getInt();
+
+		if (length == 4) {
+			this.trackersDb.remove(id);
+			System.out.println("Ha concluido la transmision de la base de datos.");
+		} else if (length == 8) {
+			int requestPartition = ByteBuffer.wrap(Arrays.copyOfRange(data, 20, 16 + length)).getInt();
+			System.out.println("Request partition: " + requestPartition);
+			sendData(this.trackersDb.get(id)[requestPartition]);
+			System.out.println("Te he enviado la siguiente particion, numero: " + requestPartition);
+		}
+	}
+
+	private synchronized void loadDatabaseData(final byte[] data) {
+		try {
+			int totalPartitions = ByteBuffer.wrap(Arrays.copyOfRange(data, 4, 8)).getInt();
+			System.out.println("Total partitions: " + totalPartitions);
+			int currentPartition = ByteBuffer.wrap(Arrays.copyOfRange(data, 8, 12)).getInt();
+			System.out.println("Current partition: " + currentPartition);
+			int contentLength = ByteBuffer.wrap(Arrays.copyOfRange(data, 12, 16)).getInt();
+			byte[] packet = Arrays.copyOfRange(data, 16, contentLength);
+			this.databaseDatagram.add(packet);
+
+			byte[] id = ByteBuffer.allocate(4).putInt(currentTracker.getId()).array();
+
+			// Si existen mas particiones se piden
+			if (currentPartition < totalPartitions) {
+				byte[] requestPartition = ByteBuffer.allocate(4).putInt(currentPartition).array();
+				byte[] response = new byte[id.length + requestPartition.length];
+
+				System.arraycopy(id, 0, response, 0, id.length);
+				System.arraycopy(requestPartition, 0, response, id.length, requestPartition.length);
+
+				sendData(createDatagram(0, response)[0]);
+			} else {
+				sendData(createDatagram(0, id)[0]);
+
+				int totalLength = 0;
+				for (int i = 0; i < this.databaseDatagram.size(); i++) {
+					totalLength += this.databaseDatagram.get(i).length;
+				}
+
+				byte[] databaseData = new byte[totalLength];
+
+				int h = 0;
+				for (int i = 0; i < this.databaseDatagram.size(); i++) {
+					for (int j = 0; j < this.databaseDatagram.get(i).length; j++) {
+						databaseData[h] = this.databaseDatagram.get(i)[j];
+						h++;
+					}
+				}
+
+				// Crea base datos
+				FileOutputStream fileOuputStream = new FileOutputStream(
+						Properties.getDatabasePath().replace("#", Integer.toString(this.currentTracker.getId())));
+				fileOuputStream.write(databaseData);
+				isDatabaseCreated = true;
+			}
+		} catch (Exception ex) {
+			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
+			}.getClass().getEnclosingMethod().getName(), ex.toString());
+			ex.printStackTrace();
+		}
+	}
+
 	public synchronized void updateTrackerKeepAlive(final int id) {
 		try {
 			// System.out.println("ID Recibida: " + id);
@@ -310,8 +383,8 @@ public class TrackersManager extends Observable implements Runnable {
 
 					byte[][] datagram = createDatagram(1, data);
 					this.trackersDb.put(t.getId(), datagram);
-					sendData(this.trackersDb.get(t.getId())[0]);
 
+					sendData(this.trackersDb.get(t.getId())[0]);
 				}
 			} else {
 				trackers.get(id).setLastKeepAlive(new Date());
@@ -396,10 +469,11 @@ public class TrackersManager extends Observable implements Runnable {
 				}
 			}
 
-			System.out.println("Datagrama creado");
-			for (int i = 0; i < partitions; i++) {
-				System.out.println("Datagrama " + (i + 1) + ": " + Arrays.toString(datagrams[i]));
-			}
+			// System.out.println("Datagrama creado");
+			// for (int i = 0; i < partitions; i++) {
+			// System.out.println("Datagrama " + (i + 1) + ": " +
+			// Arrays.toString(datagrams[i]));
+			// }
 
 		} catch (Exception e) {
 			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
@@ -449,6 +523,7 @@ public class TrackersManager extends Observable implements Runnable {
 				Window.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
 				System.out.println("Crea base datos");
 				Database.getInstance().createDatabase(this.currentTracker.getId());
+				this.isDatabaseCreated = true;
 			} else {
 				Window.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: SLAVE]");
 			}

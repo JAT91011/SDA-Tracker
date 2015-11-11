@@ -15,11 +15,6 @@ public class Application {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					// File file = new File("data/bittorrent.sqlite3");
-					// Path path = Paths.get("data/bittorrent.sqlite3");
-					// byte[] data = Files.readAllBytes(path);
-					// System.out.println("Tamaño fichero: " + data.length);
-
 					UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 					StartPanel panel = new StartPanel();
 					Window.getInstance().getSlider().addComponent(panel);
