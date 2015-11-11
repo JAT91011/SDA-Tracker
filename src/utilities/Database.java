@@ -13,13 +13,16 @@ public class Database {
 	private Connection		connection;
 
 	private Database() {
+
+	}
+
+	public void createDatabase(final int id) {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			this.connection = DriverManager.getConnection("jdbc:sqlite:" + Properties.getDatabasePath());
+			this.connection = DriverManager
+					.getConnection("jdbc:sqlite:" + Properties.getDatabasePath().replace("#", Integer.toString(id)));
 			this.update("PRAGMA encoding = \"UTF-8\";");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		if (numberOfTables() == 0) {

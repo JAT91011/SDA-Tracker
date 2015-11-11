@@ -7,6 +7,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -16,7 +19,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.Timer;
 
 import entities.Tracker;
+import utilities.Database;
 import utilities.ErrorsLog;
+import utilities.Properties;
 import views.Window;
 
 /**
@@ -26,28 +31,31 @@ import views.Window;
 
 public class TrackersManager extends Observable implements Runnable {
 
-	private static int							DATAGRAM_LENGTH	= 2048;
+	private static int								DATAGRAM_CONTENT_LENGTH	= 2032;
+	private static int								DATAGRAM_HEADER_LENGTH	= 16;
 
-	private String								ip;
-	private int									port;
-	private static TrackersManager				instance;
+	private String									ip;
+	private int										port;
+	private static TrackersManager					instance;
 
-	private boolean								enable;
-	private Tracker								currentTracker;
-	private ConcurrentHashMap<Integer, Tracker>	trackers;
+	private boolean									enable;
+	private Tracker									currentTracker;
+	private ConcurrentHashMap<Integer, Tracker>		trackers;
+	private ConcurrentHashMap<Integer, byte[][]>	trackersDb;
 
-	private Thread								readingThread;
-	private Timer								timerSendKeepAlive;
-	private Timer								timerCheckKeepAlive;
+	private Thread									readingThread;
+	private Timer									timerSendKeepAlive;
+	private Timer									timerCheckKeepAlive;
 
-	private MulticastSocket						socket;
-	private InetAddress							group;
-	private DatagramPacket						messageIn;
-	private byte[]								buffer;
+	private MulticastSocket							socket;
+	private InetAddress								group;
+	private DatagramPacket							messageIn;
+	private byte[]									buffer;
 
 	private TrackersManager() {
 		this.enable = false;
 		this.trackers = new ConcurrentHashMap<Integer, Tracker>();
+		this.trackersDb = new ConcurrentHashMap<Integer, byte[][]>();
 
 		this.timerSendKeepAlive = new Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -176,6 +184,7 @@ public class TrackersManager extends Observable implements Runnable {
 	public synchronized void removeTracker(int id) {
 		try {
 			this.trackers.remove(id);
+			this.trackersDb.remove(id);
 			setChanged();
 			notifyObservers();
 		} catch (Exception ex) {
@@ -246,7 +255,11 @@ public class TrackersManager extends Observable implements Runnable {
 					break;
 
 				case 1: // DB REPLICATION
+					// Recibir contenido y almacenarlo en ArrayList de bytes
+					// Pedir siguiente partición si existe, mandandole la Id
+					// propia OK <Id><NumPartition>
 
+					System.out.println();
 					break;
 
 				case 2: // READY_TO_SAVE
@@ -289,6 +302,16 @@ public class TrackersManager extends Observable implements Runnable {
 				if (this.currentTracker != null && this.currentTracker.isMaster()) {
 					// Enviar fichero db
 					System.out.println("Te envio fichero tracker con la id: " + t.getId());
+
+					Path path = Paths.get(
+							Properties.getDatabasePath().replace("#", Integer.toString(this.currentTracker.getId())));
+					byte[] data = Files.readAllBytes(path);
+					System.out.println("Tamaño fichero: " + data.length);
+
+					byte[][] datagram = createDatagram(1, data);
+					this.trackersDb.put(t.getId(), datagram);
+					sendData(this.trackersDb.get(t.getId())[0]);
+
 				}
 			} else {
 				trackers.get(id).setLastKeepAlive(new Date());
@@ -316,15 +339,16 @@ public class TrackersManager extends Observable implements Runnable {
 		try {
 			int length = data.length;
 			int partitions = 0;
-			if (length < (DATAGRAM_LENGTH - 16)) {
+			if (length < (DATAGRAM_CONTENT_LENGTH)) {
 				partitions = 1;
 			} else {
-				partitions = length / (DATAGRAM_LENGTH - 16);
+				partitions = length / DATAGRAM_CONTENT_LENGTH;
+				if (length % DATAGRAM_CONTENT_LENGTH > 0) {
+					partitions++;
+				}
 			}
 
-			// System.out.println("Data: " + Arrays.toString(data));
-
-			datagrams = new byte[partitions][DATAGRAM_LENGTH];
+			datagrams = new byte[partitions][DATAGRAM_CONTENT_LENGTH + DATAGRAM_HEADER_LENGTH];
 			for (int i = 0; i < partitions; i++) {
 
 				// CODE
@@ -355,17 +379,19 @@ public class TrackersManager extends Observable implements Runnable {
 					datagrams[i][13] = lengthArray[1];
 					datagrams[i][14] = lengthArray[2];
 					datagrams[i][15] = lengthArray[3];
-					for (int j = 0; j < length; j++) {
-						datagrams[i][16 + j] = data[j];
+
+					for (int j = 0; j < length - (DATAGRAM_CONTENT_LENGTH * i); j++) {
+						datagrams[i][DATAGRAM_HEADER_LENGTH + j] = data[j + (DATAGRAM_CONTENT_LENGTH * i)];
 					}
 				} else {
-					byte[] lengthArray = ByteBuffer.allocate(4).putInt(DATAGRAM_LENGTH - 16).array();
+					byte[] lengthArray = ByteBuffer.allocate(4).putInt(DATAGRAM_CONTENT_LENGTH).array();
 					datagrams[i][12] = lengthArray[0];
 					datagrams[i][13] = lengthArray[1];
 					datagrams[i][14] = lengthArray[2];
 					datagrams[i][15] = lengthArray[3];
-					for (int j = 0; j < DATAGRAM_LENGTH - 16; j++) {
-						datagrams[i][16 + j] = data[j];
+
+					for (int j = DATAGRAM_CONTENT_LENGTH * i; j < DATAGRAM_CONTENT_LENGTH * (i + 1); j++) {
+						datagrams[i][DATAGRAM_HEADER_LENGTH + (j - (i * DATAGRAM_CONTENT_LENGTH))] = data[j];
 					}
 				}
 			}
@@ -374,6 +400,7 @@ public class TrackersManager extends Observable implements Runnable {
 			for (int i = 0; i < partitions; i++) {
 				System.out.println("Datagrama " + (i + 1) + ": " + Arrays.toString(datagrams[i]));
 			}
+
 		} catch (Exception e) {
 			ErrorsLog.getInstance().writeLog(this.getClass().getName(), new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.toString());
@@ -420,6 +447,8 @@ public class TrackersManager extends Observable implements Runnable {
 			this.currentTracker.setFirstConnection(new Date());
 			if (this.currentTracker.isMaster()) {
 				Window.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: MASTER]");
+				System.out.println("Crea base datos");
+				Database.getInstance().createDatabase(this.currentTracker.getId());
 			} else {
 				Window.getInstance().setTitle("Tracker [ID: " + this.currentTracker.getId() + "] [Mode: SLAVE]");
 			}
@@ -480,7 +509,7 @@ public class TrackersManager extends Observable implements Runnable {
 	public void run() {
 		try {
 			while (this.enable) {
-				this.buffer = new byte[DATAGRAM_LENGTH];
+				this.buffer = new byte[DATAGRAM_CONTENT_LENGTH + DATAGRAM_HEADER_LENGTH];
 				this.messageIn = new DatagramPacket(buffer, buffer.length);
 				this.socket.receive(messageIn);
 				processData(this.buffer);

@@ -35,7 +35,7 @@ public class Properties implements Serializable {
 			oos.close();
 		} catch (final IOException e) {
 			e.printStackTrace();
-			properties = new Properties("", 0, 0, "data/bittorrent.sqlite3");
+			properties = new Properties("", 0, 0, "data/databases/#_bittorrent.sqlite3");
 		}
 	}
 
@@ -49,7 +49,7 @@ public class Properties implements Serializable {
 			if (!(e instanceof FileNotFoundException)) {
 				e.printStackTrace();
 			}
-			properties = new Properties("", 0, 0, "data/bittorrent.sqlite3");
+			properties = new Properties("", 0, 0, "data/databases/#_bittorrent.sqlite3");
 			properties.update();
 		}
 	}
